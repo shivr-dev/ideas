@@ -6,83 +6,81 @@
     <title>Shivr_dev 的主意征集区</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
-        .container { max-width: 1150px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+        
+        /* 动画核心：弹性贝塞尔曲线 */
+        .container { max-width: 1150px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
         h1 { color: #0366d6; margin-top: 0; }
         
         .top-tools { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; }
-        .tool-btn { background: #f0f2f5; color: #5c6bc0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .tool-btn:hover { background: #e4e6eb; }
+        .tool-btn { background: #f0f2f5; color: #5c6bc0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; gap: 5px; }
+        .tool-btn:hover { background: #e4e6eb; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .online-indicator { width: 8px; height: 8px; background: #2da44e; border-radius: 50%; box-shadow: 0 0 5px #2da44e; animation: pulse 2s infinite; }
 
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } }
+        
+        /* 弹窗果冻动画 */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
 
-        .status-bar { font-size: 14px; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-weight: bold; }
+        .status-bar { font-size: 14px; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-weight: bold; transition: all 0.3s ease; }
         .status-ok { background: #e7f3ff; color: #0e67d4; }
         .status-error { background: #ffe3e6; color: #d73a49; }
         
-        /* 修复1：优化的横向滚动表格布局 */
-        .table-wrapper { 
-            overflow-x: auto; 
-            margin-bottom: 20px; 
-            padding-bottom: 10px;
-            scroll-behavior: smooth;
-        }
-        /* 自定义漂亮的滚动条 */
+        .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; scroll-behavior: smooth; }
         .table-wrapper::-webkit-scrollbar { height: 10px; }
         .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 5px; }
-        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; transition: 0.3s; }
         .table-wrapper::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
-        table { 
-            border-collapse: collapse; 
-            table-layout: fixed; 
-            width: max-content; /* 允许表格无限向右延伸 */
-        }
-        th, td { 
-            border: 1px solid #e4e6eb; 
-            padding: 12px; 
-            text-align: center; 
-            vertical-align: top; 
-            width: 260px; /* 固定每一列的宽度，防止挤压 */
-            min-width: 260px;
-            max-width: 260px;
-            word-wrap: break-word;
-        }
+        table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: max-content; }
+        
+        /* 分组顶部的颜色细线 */
+        th, td { border: 1px solid #e4e6eb; padding: 15px; text-align: center; vertical-align: top; width: 260px; min-width: 260px; max-width: 260px; word-wrap: break-word; transition: all 0.3s ease; background: #fff;}
         th { background: #f8f9fa; color: #65676b; }
         
-        input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; transition: border 0.3s ease, box-shadow 0.3s ease; }
+        input[type="text"]:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline: none;}
         
-        .editor-box { width: 100%; min-height: 120px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; text-align: left; background: #fff; overflow-y: auto; font-size: 14px; line-height: 1.5; outline: none; }
+        .editor-box { width: 100%; min-height: 120px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; text-align: left; background: #fff; overflow-y: auto; font-size: 14px; line-height: 1.5; outline: none; transition: all 0.3s ease; }
         .editor-box:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
-        .editor-box img { max-width: 100%; border-radius: 4px; margin: 5px 0; cursor: pointer; }
+        .editor-box img { max-width: 100%; border-radius: 4px; margin: 5px 0; cursor: pointer; transition: transform 0.2s; }
+        .editor-box img:hover { transform: scale(1.02); }
         
         .guest-view-box { min-height: 120px; text-align: left; background: #f8f9fa; overflow: hidden; display: block; white-space: pre-wrap; word-break: break-all; }
         .guest-view-box img { max-width: 100%; border-radius: 4px; margin-top: 5px; }
 
-        .btn { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; padding: 10px 20px; transition: 0.2s; }
-        .btn-save { background: #2da44e; color: white; font-size: 16px; }
-        .btn-save:hover { background: #2c974b; }
-        .btn-add { background: #6e7781; color: white; }
-        .btn-delete-col { background: #ffe3e6; color: #d73a49; font-size: 13px; padding: 6px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; transition: 0.2s; font-weight: bold; }
-        .btn-delete-col:hover { background: #ffc1c6; }
-        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 10px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s; }
-        .btn-fullscreen:hover { background: #d0e4ff; }
+        .btn { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; padding: 10px 20px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn:active { transform: translateY(0) scale(0.98); box-shadow: none; }
         
+        .btn-save { background: #2da44e; color: white; font-size: 16px; }
+        .btn-add { background: #6e7781; color: white; }
+        .btn-delete-col { background: #fff; color: #d73a49; font-size: 13px; padding: 6px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; transition: all 0.2s; font-weight: bold; }
+        .btn-delete-col:hover { background: #ffe3e6; transform: scale(1.02); }
+        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 10px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; }
+        .btn-fullscreen:hover { background: #d0e4ff; transform: scale(1.02); }
+        
+        /* 投票卡片悬浮动画 */
         .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
-        .vote-card { border: 1px solid #e4e6eb; padding: 25px 20px; border-radius: 10px; text-align: center; background: #fafbfc; }
-        .count { font-size: 36px; font-weight: bold; color: #d73a49; margin-bottom: 15px; }
-        .btn-vote { background: #0366d6; color: white; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-vote:hover { background: #005cc5; }
-        .btn-revoke { background: #fff; color: #d73a49; width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #d73a49; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .vote-card { border: 1px solid #e4e6eb; padding: 25px 20px; border-radius: 10px; text-align: center; background: #fafbfc; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .vote-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.08); border-color: #c8e1ff; }
+        
+        .count { font-size: 36px; font-weight: bold; color: #d73a49; margin-bottom: 15px; transition: color 0.3s; }
+        .btn-vote { background: #0366d6; color: white; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-vote:hover { background: #005cc5; transform: scale(1.03); }
+        .btn-revoke { background: #fff; color: #d73a49; width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #d73a49; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-revoke:hover { background: #fff1f2; transform: scale(1.03); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;}
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease; }
+        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
         
         .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid #e4e6eb; }
         .format-btn { background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 15px; font-family: serif; color: #333; transition: 0.2s; }
         .format-btn:hover { background: #e4e6eb; border-color: #bbb; }
         
-        .modal-editor { flex-grow: 1; min-height: 300px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; outline: none; }
+        .modal-editor { flex-grow: 1; min-height: 300px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; outline: none; transition: all 0.3s; }
         .modal-editor:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
         
         .modal-actions { margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
@@ -90,15 +88,27 @@
         
         .timestamp { font-size: 12px; color: #888; margin-top: 8px; text-align: center; }
         .admin-controls { display: flex; gap: 10px; justify-content: flex-end; }
-        .image-upload-wrapper { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: space-between;}
-        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .image-upload-wrapper { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; }
+        .image-upload-wrapper:hover { border-color: #0366d6; background: #f1f8ff; }
+        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; transition: all 0.3s; }
+        .login-input:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline:none; transform: scale(1.01);}
         
         .guide-text { font-size: 16px; line-height: 1.8; color: #333; text-align: left; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        
+        /* 分组样式 */
+        .group-badge { display: inline-block; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-shadow: 0 1px 1px rgba(0,0,0,0.2);}
+        .group-inputs { display: flex; gap: 8px; margin-top: 10px; align-items: center; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e1e4e8; }
+        .group-name-input { font-size: 13px; padding: 6px !important; flex-grow: 1; border: 1px solid #d0d7de !important; border-radius: 4px !important; }
+        .group-color-input { width: 32px; height: 32px; padding: 0; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px #e1e4e8; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .group-color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
+        .group-color-input:hover { transform: scale(1.1); box-shadow: 0 0 0 2px rgba(3,102,214,0.3); }
+
     </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="loginModal" style="display: flex;">
+<div class="modal-overlay" id="loginModal" style="display: flex; opacity: 1;">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
         <h2 style="margin-bottom: 5px;">🔐 系统登录</h2>
         <p style="color: #666; font-size: 14px; margin-bottom: 25px;">请验证身份以获取编辑权限</p>
@@ -107,7 +117,7 @@
         <input type="password" id="loginPass" class="login-input" placeholder="密码">
         
         <div style="text-align: left; margin-bottom: 20px;">
-            <label style="cursor: pointer; color: #555;"><input type="checkbox" id="rememberMe"> 记住此次登录</label>
+            <label style="cursor: pointer; color: #555; font-size:14px;"><input type="checkbox" id="rememberMe"> 记住此次登录</label>
         </div>
         
         <div class="modal-actions" style="justify-content: center; flex-direction: column;">
@@ -197,19 +207,22 @@
 <script>
     // ======= 请配置你的 Token =======
     const p1 = 'ghp_'; 
-    const p2 = 'YBzj3fro9xQ18P3oRCv89zmM9Pm80j2enZIj'; // <-- 记得在这里填Token！
+    const p2 = 'YBzj3fro9xQ18P3oRCv89zmM9Pm80j2enZIj'; // <-- 记得填Token！
     const G_TOKEN = p1 + p2; 
 
     const REPO_OWNER = 'shivr-dev';
-    const REPO_NAME = 'ideas';
+    const REPO_NAME = 'Vote';
     const ISSUE_ID = 1; 
     // ================================
 
+    // 增加了分组数据字段
     let data = { 
         topics: ["添加隐藏宝箱", "做个月球地图"], 
         contents: ["在地图角落放一些彩蛋<br>", "可以在失重环境下跳跃<br>"],
         editTimes: ["", ""], 
-        votes: [0, 0] 
+        votes: [0, 0],
+        groups: ["", ""],          // 新增：分组名称
+        groupColors: ["#0366d6", "#0366d6"] // 新增：分组颜色
     };
 
     let currentUserRole = null; 
@@ -239,14 +252,17 @@
 
     function grantAccess(role, isAutoLogin) {
         currentUserRole = role;
-        document.getElementById('loginModal').style.display = 'none';
+        // 动画隐藏弹窗
+        document.getElementById('loginModal').style.opacity = '0';
+        setTimeout(() => document.getElementById('loginModal').style.display = 'none', 300);
+        
         document.getElementById('mainApp').style.display = 'block';
         document.getElementById('roleBadge').innerText = role === 'admin' ? '👑 管理员' : '👁️ 游客';
         if (role === 'guest') document.getElementById('adminButtons').style.display = 'none'; 
         else if (role === 'admin' && !isAutoLogin) openModal('adminGuideModal');
         
         loadData(); 
-        setInterval(loadData, 8000); // 稍微放缓自动刷新频率，防止覆盖未保存内容
+        setInterval(loadData, 8000); 
     }
 
     // --- 数据交互 ---
@@ -260,6 +276,10 @@
             if (remoteData && remoteData.topics) {
                 if (!remoteData.contents) remoteData.contents = remoteData.topics.map(() => "");
                 if (!remoteData.editTimes) remoteData.editTimes = remoteData.topics.map(() => "");
+                // 兼容老数据，如果没有分组信息，自动补全空分组
+                if (!remoteData.groups) remoteData.groups = remoteData.topics.map(() => "");
+                if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
+                
                 data = remoteData;
                 
                 if (isFirstLoad) { renderTable(); isFirstLoad = false; }
@@ -286,50 +306,78 @@
         } catch (e) { showStatus("❌ 保存失败，请检查网络", "status-error"); }
     }
 
-    // --- 修复2：坚固的渲染引擎 (原生 DOM 构建，杜绝串列 Bug) ---
+    // --- 【核心进化】智能分组渲染引擎 ---
     function renderTable() {
         const tHead = document.getElementById('tHead');
         const tBody = document.getElementById('tBody');
-        tHead.innerHTML = ''; tBody.innerHTML = ''; // 清空旧数据
+        tHead.innerHTML = ''; tBody.innerHTML = ''; 
         
-        const tr1 = document.createElement('tr'); // 编号行
-        const tr2 = document.createElement('tr'); // 标题行
-        const tr3 = document.createElement('tr'); // 内容行
+        const tr1 = document.createElement('tr'); 
+        const tr2 = document.createElement('tr'); 
+        const tr3 = document.createElement('tr'); 
 
-        // 添加表头第一列说明
-        let th1 = document.createElement('th'); th1.innerText = '1. 编号'; tr1.appendChild(th1);
-        let th2 = document.createElement('th'); th2.innerText = '2. 主题名称'; tr2.appendChild(th2);
+        let th1 = document.createElement('th'); th1.innerText = '1. 编号 (支持分组)'; tr1.appendChild(th1);
+        let th2 = document.createElement('th'); th2.innerText = '2. 主题名称与分类'; tr2.appendChild(th2);
         let th3 = document.createElement('th'); th3.innerText = '3. 内容详情'; tr3.appendChild(th3);
 
-        data.topics.forEach((topic, i) => {
-            // 编号
+        // 【智能映射算法】：计算出一个排序后的索引数组，原数据彻底不动！
+        // 这样你怎么删、怎么点，都不会出现错位的情况。
+        let indices = data.topics.map((_, i) => i);
+        indices.sort((a, b) => {
+            let gA = data.groups[a] || "";
+            let gB = data.groups[b] || "";
+            if (gA && !gB) return -1; // 有分组的排前面
+            if (!gA && gB) return 1;
+            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'}); // 同分组排一起
+            return a - b; // 组内按原始编号从小到大排
+        });
+
+        // 按照排好序的索引渲染界面
+        indices.forEach((i) => {
+            let topic = data.topics[i];
+            let groupName = data.groups[i] || "";
+            let groupColor = data.groupColors[i] || "#0366d6";
+            
+            // 编号行 (加入顶部彩色细线)
             let td1 = document.createElement('td'); 
-            td1.innerHTML = `<strong style="font-size: 18px; color: #0366d6;"># ${i+1}</strong>`; 
+            // 如果有分组，顶部显示对应颜色的粗线
+            if (groupName) td1.style.borderTop = `5px solid ${groupColor}`;
+            
+            td1.innerHTML = `<strong style="font-size: 18px; color: ${groupName ? groupColor : '#0366d6'};"># ${i+1}</strong>`; 
             tr1.appendChild(td1);
             
-            // 标题
+            // 标题与分组行
             let td2 = document.createElement('td');
             if (currentUserRole === 'admin') {
-                let inp = document.createElement('input');
-                inp.type = 'text'; inp.id = `topic_${i}`; inp.value = topic;
-                td2.appendChild(inp);
+                let topicHtml = `<input type="text" id="topic_${i}" value="${topic}" placeholder="输入主题名称">`;
+                // 管理员特有：分组设置面板
+                topicHtml += `
+                    <div class="group-inputs">
+                        <span style="font-size: 12px; color: #666; font-weight: bold;">分组:</span>
+                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" placeholder="名称(不填则无分组)">
+                        <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" title="选择该分组的横条颜色">
+                    </div>
+                `;
+                td2.innerHTML = topicHtml;
             } else {
-                let div = document.createElement('div');
-                div.className = 'guest-view-box'; div.style.minHeight = 'auto'; div.innerText = topic || '未命名主题';
-                td2.appendChild(div);
+                let html = '';
+                // 游客视角：如果有分组，显示漂亮的颜色徽章
+                if (groupName) {
+                    html += `<div class="group-badge" style="background-color: ${groupColor};">${groupName}</div>`;
+                }
+                html += `<div class="guest-view-box" style="min-height: auto;">${topic || '未命名主题'}</div>`;
+                td2.innerHTML = html;
             }
             tr2.appendChild(td2);
 
-            // 内容
+            // 内容与按钮行
             let td3 = document.createElement('td');
             if (currentUserRole === 'admin') {
-                // 安全插入HTML内容容器
                 let contentDiv = document.createElement('div');
                 contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box'; contentDiv.contentEditable = true;
-                contentDiv.innerHTML = data.contents[i]; // 将风险内容隔离在这个 Div 内部，绝不会破坏表格结构
+                contentDiv.innerHTML = data.contents[i]; 
                 td3.appendChild(contentDiv);
                 
-                // 按钮区
                 let toolsDiv = document.createElement('div');
                 toolsDiv.innerHTML = `
                     <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
@@ -364,13 +412,25 @@
         data.topics.forEach((_, i) => {
             const topicEl = document.getElementById(`topic_${i}`);
             const contentEl = document.getElementById(`content_${i}`);
+            const groupEl = document.getElementById(`group_${i}`);
+            const colorEl = document.getElementById(`color_${i}`);
+            
             if (topicEl && contentEl) {
                 const oldContent = data.contents[i];
                 const oldTopic = data.topics[i];
+                const oldGroup = data.groups[i];
                 
                 data.topics[i] = topicEl.value;
                 data.contents[i] = contentEl.innerHTML;
-                if (oldContent !== data.contents[i] || oldTopic !== data.topics[i]) data.editTimes[i] = timeString;
+                
+                if (groupEl && colorEl) {
+                    data.groups[i] = groupEl.value.trim();
+                    data.groupColors[i] = colorEl.value;
+                }
+                
+                if (oldContent !== data.contents[i] || oldTopic !== data.topics[i] || oldGroup !== data.groups[i]) {
+                    data.editTimes[i] = timeString;
+                }
             }
         });
     }
@@ -379,25 +439,29 @@
         if (currentUserRole !== 'admin') return;
         if (!confirm("⚠️ 确定要彻底删除这一列的所有内容和投票吗？操作不可逆！")) return;
         
-        syncDomToData(); // 同步尚未保存的数据
-        
-        // 执行切除操作
+        syncDomToData(); 
         data.topics.splice(index, 1);
         data.contents.splice(index, 1);
         data.editTimes.splice(index, 1);
         data.votes.splice(index, 1);
+        data.groups.splice(index, 1);
+        data.groupColors.splice(index, 1);
         
-        renderTable(); 
-        saveDataToServer(); 
+        renderTable(); saveDataToServer(); 
     }
 
     function addColumn() {
         if (currentUserRole !== 'admin') return;
         syncDomToData(); 
-        data.topics.push(""); data.contents.push("<br>"); data.editTimes.push(""); data.votes.push(0);
+        data.topics.push(""); 
+        data.contents.push("<br>"); 
+        data.editTimes.push(""); 
+        data.votes.push(0);
+        data.groups.push(""); 
+        data.groupColors.push("#0366d6"); 
+        
         renderTable(); saveDataToServer(); 
         
-        // 自动将滚动条滑到最右边查看新列
         setTimeout(() => {
             const container = document.getElementById('scrollContainer');
             container.scrollLeft = container.scrollWidth;
@@ -409,7 +473,6 @@
         document.getElementById('fullscreenEditor').focus();
     }
 
-    // --- 修复3：史诗优化，云端仓库直传图片 (突破字数极限) ---
     async function uploadImageToRepo(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -422,7 +485,6 @@
         reader.onload = async function(e) {
             const img = new Image();
             img.onload = async function() {
-                // 不再进行极度压缩，保留较高画质，因为存在独立文件里了
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 1000; 
                 let width = img.width; let height = img.height;
@@ -432,40 +494,29 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // 提取纯 Base64 数据用于 API 传输
                 const base64DataFull = canvas.toDataURL('image/jpeg', 0.85); 
                 const base64Data = base64DataFull.split(',')[1]; 
-                
-                // 随机生成文件名
                 const filename = `vote_img_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
                 
                 try {
-                    // 调用 GitHub Contents API 直接在你的仓库里新建一个图片文件
                     const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/images/${filename}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            message: `[Auto] Upload image via Map Vote App`,
-                            content: base64Data
-                        })
+                        body: JSON.stringify({ message: `[Auto] Upload image via Map Vote App`, content: base64Data })
                     });
-
                     if (!res.ok) throw new Error(`上传失败 (${res.status})`);
                     
                     const uploadResult = await res.json();
-                    // 获取刚上传成功的图片直链
                     const imageUrl = uploadResult.content.download_url;
                     
-                    // 将极简短的网址插入编辑器，不再撑爆 JSON！
                     document.getElementById('fullscreenEditor').focus();
                     document.execCommand('insertHTML', false, `<br><img src="${imageUrl}" alt="云端图片" style="max-width:100%; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1);"><br>`);
-                    
                     showStatus("✅ 图片已成功上传至云端图床！", "status-ok");
                 } catch (err) {
                     alert("图片上传失败，请检查 Token 权限或网络：" + err.message);
                     showStatus("❌ 图片上传失败", "status-error");
                 } finally {
-                    event.target.value = ''; // 重置文件选择器
+                    event.target.value = ''; 
                     document.getElementById('btnSaveFullscreen').disabled = false;
                     document.getElementById('btnSaveFullscreen').innerText = "确认并保存";
                 }
@@ -493,13 +544,13 @@
             document.getElementById('fullscreenGuestView').innerHTML = data.contents[index]; 
         }
         
-        document.getElementById('editModal').style.display = 'flex';
+        openModal('editModal');
     }
 
     function saveFullscreen() {
         if (currentUserRole !== 'admin') return;
         document.getElementById(`content_${currentEditIndex}`).innerHTML = document.getElementById('fullscreenEditor').innerHTML;
-        document.getElementById('editModal').style.display = 'none';
+        closeModal('editModal');
         manualSave(); 
     }
 
@@ -518,12 +569,32 @@
         voteArea.innerHTML = '';
         const myVotes = getMyVotes();
 
-        data.topics.forEach((topic, i) => {
+        // 投票区也按照智能映射的分组顺序来展示
+        let indices = data.topics.map((_, i) => i);
+        indices.sort((a, b) => {
+            let gA = data.groups[a] || ""; let gB = data.groups[b] || "";
+            if (gA && !gB) return -1; if (!gA && gB) return 1;
+            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'});
+            return a - b;
+        });
+
+        indices.forEach((i) => {
+            let topic = data.topics[i];
+            let groupName = data.groups[i] || "";
+            let groupColor = data.groupColors[i] || "#0366d6";
+            
             let btn = myVotes[i] 
                 ? `<button class="btn-revoke" onclick="revokeVote(${i})">↩ 已支持 (点击撤回)</button>` 
                 : `<button class="btn-vote" onclick="castVote(${i})">👆 支持这个想法</button>`;
             
-            voteArea.innerHTML += `<div class="vote-card"><h3>${topic || '未命名'}</h3><div class="count">${data.votes[i]}</div>${btn}</div>`;
+            let badgeHtml = groupName ? `<div class="group-badge" style="background-color: ${groupColor}; font-size:11px; margin-bottom:10px;">${groupName}</div>` : '';
+            
+            voteArea.innerHTML += `<div class="vote-card" style="${groupName ? 'border-top: 4px solid '+groupColor+';' : ''}">
+                ${badgeHtml}
+                <h3 style="margin-top:0;">${topic || '未命名'}</h3>
+                <div class="count">${data.votes[i]}</div>
+                ${btn}
+            </div>`;
         });
     }
 
@@ -531,13 +602,9 @@
         let myVotes = getMyVotes();
         if (myVotes[index]) return; 
         
-        data.votes[index]++;
-        myVotes[index] = true;
-        localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
-        
+        data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
         fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH',
-            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ body: JSON.stringify(data) })
         }).then(() => renderVotes());
     }
@@ -546,19 +613,24 @@
         let myVotes = getMyVotes();
         if (!myVotes[index]) return; 
         
-        if (data.votes[index] > 0) data.votes[index]--;
-        delete myVotes[index];
-        localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
-        
+        if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
         fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH',
-            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ body: JSON.stringify(data) })
         }).then(() => renderVotes());
     }
 
-    function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    // 动画弹窗开闭逻辑
+    function openModal(modalId) { 
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'flex'; 
+        setTimeout(() => modal.style.opacity = '1', 10);
+    }
+    function closeModal(modalId) { 
+        const modal = document.getElementById(modalId);
+        modal.style.opacity = '0'; 
+        setTimeout(() => modal.style.display = 'none', 300); // 等待动画结束再隐藏
+    }
     function showStatus(msg, className) { document.getElementById('status').innerText = msg; document.getElementById('status').className = `status-bar ${className}`; }
     
     function updateOnlineCounter() {
