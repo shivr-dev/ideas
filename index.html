@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>主意投票和更新</title>
+    <title>Shivr_dev 的主意征集区</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
         .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
@@ -26,8 +26,6 @@
         th { background: #f8f9fa; color: #65676b; width: 25%; }
         
         input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        /* 将 textarea 改为仅作数据存储，管理员用 contenteditable div */
-        textarea { display: none; } 
         
         .editor-box { width: 100%; min-height: 80px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; text-align: left; background: #fff; overflow-y: auto; font-size: 14px; line-height: 1.5; outline: none; }
         .editor-box:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
@@ -40,9 +38,9 @@
         .btn-save { background: #2da44e; color: white; font-size: 16px; }
         .btn-save:hover { background: #2c974b; }
         .btn-add { background: #6e7781; color: white; }
-        .btn-delete-col { background: #ffe3e6; color: #d73a49; font-size: 12px; padding: 4px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; }
+        .btn-delete-col { background: #ffe3e6; color: #d73a49; font-size: 12px; padding: 4px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; transition: 0.2s; }
         .btn-delete-col:hover { background: #ffc1c6; }
-        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 8px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; }
+        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 8px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; transition: 0.2s; }
         .btn-fullscreen:hover { background: #d0e4ff; }
         
         .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -55,8 +53,13 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-content { background: white; width: 90%; max-width: 700px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;}
         
-        .modal-editor { flex-grow: 1; min-height: 350px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; }
-        .modal-editor:focus { border-color: #0366d6; outline: none; }
+        /* 富文本编辑器工具栏样式 */
+        .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid #e4e6eb; }
+        .format-btn { background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 15px; font-family: serif; color: #333; transition: 0.2s; }
+        .format-btn:hover { background: #e4e6eb; border-color: #bbb; }
+        
+        .modal-editor { flex-grow: 1; min-height: 300px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; outline: none; }
+        .modal-editor:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
         
         .modal-actions { margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
         .btn-close-modal { background: #e4e6eb; color: #333; }
@@ -76,7 +79,7 @@
         <h2 style="margin-bottom: 5px;">🔐 系统登录</h2>
         <p style="color: #666; font-size: 14px; margin-bottom: 25px;">请验证身份以获取编辑权限</p>
         
-        <input type="text" id="loginUser" class="login-input" placeholder="用户名 (管理员请输入 Inf)">
+        <input type="text" id="loginUser" class="login-input" placeholder="用户名 (管理员请输入 Infrato)">
         <input type="password" id="loginPass" class="login-input" placeholder="密码">
         
         <div style="text-align: left; margin-bottom: 20px;">
@@ -92,7 +95,7 @@
 
 <div class="modal-overlay" id="adminGuideModal">
     <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2>👑 欢迎回来</h2>
+        <h2>👑 欢迎回来，管理员</h2>
         <div class="guide-text">
             这个网站可以用来更新地图、投票地图想法<br>
             没有管理员账号的是不会编辑内容的。<br>
@@ -144,7 +147,13 @@
         <div class="image-upload-wrapper" id="imageUploadArea">
             <label style="font-weight: bold; font-size: 14px;">插入本地图片：</label>
             <input type="file" id="imageInput" accept="image/*" onchange="insertImage(event)">
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #888;">插入后，可直接在下方编辑区点击图片按退格键(Backspace)删除。</p>
+        </div>
+
+        <div class="editor-toolbar" id="textToolbar" style="display: none;">
+            <button class="format-btn" style="font-weight: bold;" onclick="formatText('bold')" title="加粗">B</button>
+            <button class="format-btn" style="font-style: italic;" onclick="formatText('italic')" title="斜体">I</button>
+            <button class="format-btn" style="text-decoration: underline;" onclick="formatText('underline')" title="下划线">U</button>
+            <span style="color: #aaa; margin-left: auto; font-size: 13px; align-self: center;">选中文本后点击按钮，或直接插入图片</span>
         </div>
 
         <div id="fullscreenEditor" class="modal-editor" contenteditable="true" placeholder="在这里输入详细内容..."></div>
@@ -185,7 +194,7 @@
         const savedRole = localStorage.getItem('userRole');
         if (savedRole === 'admin') {
             document.getElementById('rememberMe').checked = true;
-            grantAccess('admin', true); // true 表示从缓存恢复，不重复弹指南
+            grantAccess('admin', true); 
         } else if (savedRole === 'guest') {
             document.getElementById('rememberMe').checked = true;
             grantAccess('guest', true);
@@ -226,7 +235,6 @@
         if (role === 'guest') {
             document.getElementById('adminButtons').style.display = 'none'; 
         } else if (role === 'admin' && !isAutoLogin) {
-            // 只有管理员手动输入账号密码登录时，才弹出指南
             openModal('adminGuideModal');
         }
         
@@ -294,7 +302,6 @@
             
             if (currentUserRole === 'admin') {
                 row2 += `<td><input type="text" id="topic_${i}" value="${topic}"></td>`;
-                // 管理员使用 contenteditable 的 div 代替 textarea，方便直接看到和删除图片
                 row3 += `<td>
                     <div id="content_${i}" class="editor-box" contenteditable="true">${data.contents[i]}</div>
                     <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
@@ -315,20 +322,53 @@
         tBody.innerHTML = row2 + '</tr>' + row3 + '</tr>';
     }
 
-    // --- 删除列功能 ---
+    // --- 修复：在执行任何数组变更前，先将当前网页上的文字同步进变量里 ---
+    function syncDomToData() {
+        const now = new Date();
+        const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        
+        data.topics.forEach((_, i) => {
+            const topicEl = document.getElementById(`topic_${i}`);
+            const contentEl = document.getElementById(`content_${i}`);
+            
+            if (topicEl && contentEl) {
+                const oldContent = data.contents[i];
+                const oldTopic = data.topics[i];
+                
+                data.topics[i] = topicEl.value;
+                data.contents[i] = contentEl.innerHTML;
+                
+                if (oldContent !== data.contents[i] || oldTopic !== data.topics[i]) {
+                    data.editTimes[i] = timeString;
+                }
+            }
+        });
+    }
+
+    // --- 修复后的删除列功能 ---
     function deleteColumn(index) {
         if (currentUserRole !== 'admin') return;
         if (!confirm("⚠️ 确定要彻底删除这一列的所有内容和投票吗？操作不可逆！")) return;
+        
+        // 【关键修复】删除前，先将网页上其他列尚未保存的内容写入内存，防止丢失和错位
+        syncDomToData(); 
         
         data.topics.splice(index, 1);
         data.contents.splice(index, 1);
         data.editTimes.splice(index, 1);
         data.votes.splice(index, 1);
         
-        manualSave(); 
+        renderTable(); 
+        saveDataToServer(); 
     }
 
-    // --- 本地极速压缩图片算法 (插入到光标位置) ---
+    // --- 富文本格式化命令 ---
+    function formatText(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('fullscreenEditor').focus();
+    }
+
+    // --- 本地极速压缩图片算法 ---
     function insertImage(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -349,11 +389,9 @@
                 ctx.drawImage(img, 0, 0, width, height);
                 const base64Data = canvas.toDataURL('image/jpeg', 0.5); 
                 
-                // 向富文本编辑器中插入图片
                 document.getElementById('fullscreenEditor').focus();
                 document.execCommand('insertHTML', false, `<br><img src="${base64Data}" alt="用户插入的图片"><br>`);
                 
-                // 重置 file input，允许重复传同一张图
                 event.target.value = '';
                 
                 if (JSON.stringify(data).length + base64Data.length > 50000) {
@@ -371,12 +409,12 @@
         const isAdmin = currentUserRole === 'admin';
         
         document.getElementById('imageUploadArea').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('textToolbar').style.display = isAdmin ? 'flex' : 'none';
         document.getElementById('btnSaveFullscreen').style.display = isAdmin ? 'inline-block' : 'none';
         
         if (isAdmin) {
             document.getElementById('fullscreenEditor').style.display = 'block';
             document.getElementById('fullscreenGuestView').style.display = 'none';
-            // 读取对应单元格的 HTML
             document.getElementById('fullscreenEditor').innerHTML = document.getElementById(`content_${index}`).innerHTML;
         } else {
             document.getElementById('fullscreenEditor').style.display = 'none';
@@ -389,7 +427,6 @@
 
     function saveFullscreen() {
         if (currentUserRole !== 'admin') return;
-        // 把全屏编辑器里的 HTML 代码写回小表格
         const newHtml = document.getElementById('fullscreenEditor').innerHTML;
         document.getElementById(`content_${currentEditIndex}`).innerHTML = newHtml;
         document.getElementById('editModal').style.display = 'none';
@@ -398,38 +435,20 @@
 
     function manualSave() {
         if (currentUserRole !== 'admin') return;
-        const now = new Date();
-        const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-        
-        data.topics.forEach((_, i) => {
-            const oldContent = data.contents[i];
-            const oldTopic = data.topics[i];
-            
-            data.topics[i] = document.getElementById(`topic_${i}`).value;
-            // 获取 contenteditable 里的 HTML 内容
-            data.contents[i] = document.getElementById(`content_${i}`).innerHTML;
-            
-            if (oldContent !== data.contents[i] || oldTopic !== data.topics[i]) {
-                data.editTimes[i] = timeString;
-            }
-        });
-        
+        syncDomToData(); // 调用修复后的同步函数
         renderTable(); 
         saveDataToServer();
     }
 
     function addColumn() {
         if (currentUserRole !== 'admin') return;
-        manualSave();
+        syncDomToData(); // 同样在增加前先同步
         data.topics.push(""); data.contents.push("<br>"); data.editTimes.push(""); data.votes.push(0);
         renderTable(); saveDataToServer(); 
     }
 
     /* --- 多项独立投票系统 --- */
-    // 获取我的投票记录对象 { 0: true, 2: true }
-    function getMyVotes() {
-        return JSON.parse(localStorage.getItem('myMapVotes') || '{}');
-    }
+    function getMyVotes() { return JSON.parse(localStorage.getItem('myMapVotes') || '{}'); }
 
     function renderVotes() {
         const voteArea = document.getElementById('voteArea');
@@ -447,7 +466,7 @@
 
     function castVote(index) {
         let myVotes = getMyVotes();
-        if (myVotes[index]) return; // 这项已经投过了
+        if (myVotes[index]) return; 
         
         data.votes[index]++;
         myVotes[index] = true;
@@ -462,7 +481,7 @@
 
     function revokeVote(index) {
         let myVotes = getMyVotes();
-        if (!myVotes[index]) return; // 没投过无法撤回
+        if (!myVotes[index]) return; 
         
         if (data.votes[index] > 0) data.votes[index]--;
         delete myVotes[index];
