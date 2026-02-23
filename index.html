@@ -3,641 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>主意征集区</title>
+    <title>Shivr_dev 终极创意面板 v4.0</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
-        
-        /* 动画核心：弹性贝塞尔曲线 */
-        .container { max-width: 1150px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        h1 { color: #0366d6; margin-top: 0; }
-        
-        .top-tools { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; }
-        .tool-btn { background: #f0f2f5; color: #5c6bc0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; gap: 5px; }
-        .tool-btn:hover { background: #e4e6eb; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .online-indicator { width: 8px; height: 8px; background: #2da44e; border-radius: 50%; box-shadow: 0 0 5px #2da44e; animation: pulse 2s infinite; }
-
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } }
-        
-        /* 弹窗果冻动画 */
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        /* --- 1. 核心弹性动画 (贝塞尔曲线) --- */
+        :root {
+            --elastic: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #0366d6;
         }
 
-        .status-bar { font-size: 14px; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-weight: bold; transition: all 0.3s ease; }
-        .status-ok { background: #e7f3ff; color: #0e67d4; }
-        .status-error { background: #ffe3e6; color: #d73a49; }
-        
-        .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; scroll-behavior: smooth; }
-        .table-wrapper::-webkit-scrollbar { height: 10px; }
-        .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 5px; }
-        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; transition: 0.3s; }
-        .table-wrapper::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(45, 164, 78, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } }
 
+        /* --- 2. 基础样式 --- */
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f4f7f9; margin: 0; padding: 20px; color: #1a1a1a; }
+        .container { 
+            max-width: 1300px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); position: relative;
+            animation: popIn 0.6s var(--elastic);
+        }
+
+        /* --- 3. 顶部工具栏 --- */
+        .header-tools { position: absolute; top: 30px; right: 40px; display: flex; gap: 12px; align-items: center; }
+        .badge-btn { 
+            background: #f0f2f5; border: none; padding: 8px 16px; border-radius: 30px; 
+            font-weight: bold; color: #555; display: flex; align-items: center; gap: 8px;
+            transition: all 0.3s var(--elastic); cursor: default;
+        }
+        .logout-btn { cursor: pointer; background: #ffeef0; color: #d73a49; }
+        .logout-btn:hover { background: #d73a49; color: white; transform: translateY(-2px); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #2da44e; animation: pulse 2s infinite; }
+
+        /* --- 4. 状态指示器 --- */
+        .status-msg { 
+            font-size: 14px; padding: 12px; border-radius: 10px; margin-bottom: 25px; 
+            text-align: center; font-weight: 600; transition: all 0.3s ease;
+        }
+        .ok { background: #e6ffed; color: #22863a; border: 1px solid #acf2bd; }
+        .err { background: #ffeef0; color: #d73a49; border: 1px solid #fdb8c0; }
+
+        /* --- 5. 表格与分组系统 --- */
+        .scroll-x { overflow-x: auto; border-radius: 12px; border: 1px solid #e1e4e8; margin-bottom: 30px; }
+        .scroll-x::-webkit-scrollbar { height: 8px; }
+        .scroll-x::-webkit-scrollbar-thumb { background: #d1d5da; border-radius: 10px; }
+        
         table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: max-content; }
-        
-        /* 分组顶部的颜色细线 */
-        th, td { border: 1px solid #e4e6eb; padding: 15px; text-align: center; vertical-align: top; width: 260px; min-width: 260px; max-width: 260px; word-wrap: break-word; transition: all 0.3s ease; background: #fff;}
-        th { background: #f8f9fa; color: #65676b; }
-        
-        input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; transition: border 0.3s ease, box-shadow 0.3s ease; }
-        input[type="text"]:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline: none;}
-        
-        .editor-box { width: 100%; min-height: 120px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; text-align: left; background: #fff; overflow-y: auto; font-size: 14px; line-height: 1.5; outline: none; transition: all 0.3s ease; }
-        .editor-box:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
-        .editor-box img { max-width: 100%; border-radius: 4px; margin: 5px 0; cursor: pointer; transition: transform 0.2s; }
-        .editor-box img:hover { transform: scale(1.02); }
-        
-        .guest-view-box { min-height: 120px; text-align: left; background: #f8f9fa; overflow: hidden; display: block; white-space: pre-wrap; word-break: break-all; }
-        .guest-view-box img { max-width: 100%; border-radius: 4px; margin-top: 5px; }
+        th, td { 
+            padding: 20px; border-right: 1px solid #e1e4e8; border-bottom: 1px solid #e1e4e8; 
+            width: 300px; background: #fff; vertical-align: top;
+            transition: all 0.3s ease;
+        }
+        th { background: #fafbfc; color: #586069; font-size: 12px; text-align: center; }
 
-        .btn { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; padding: 10px 20px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .btn:active { transform: translateY(0) scale(0.98); box-shadow: none; }
+        .group-tag-box { 
+            display: flex; align-items: center; gap: 8px; margin-top: 10px; 
+            background: #f6f8fa; padding: 8px; border-radius: 8px;
+        }
         
-        .btn-save { background: #2da44e; color: white; font-size: 16px; }
-        .btn-add { background: #6e7781; color: white; }
-        .btn-delete-col { background: #fff; color: #d73a49; font-size: 13px; padding: 6px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; transition: all 0.2s; font-weight: bold; }
-        .btn-delete-col:hover { background: #ffe3e6; transform: scale(1.02); }
-        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 10px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; }
-        .btn-fullscreen:hover { background: #d0e4ff; transform: scale(1.02); }
-        
-        /* 投票卡片悬浮动画 */
-        .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
-        .vote-card { border: 1px solid #e4e6eb; padding: 25px 20px; border-radius: 10px; text-align: center; background: #fafbfc; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .vote-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.08); border-color: #c8e1ff; }
-        
-        .count { font-size: 36px; font-weight: bold; color: #d73a49; margin-bottom: 15px; transition: color 0.3s; }
-        .btn-vote { background: #0366d6; color: white; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .btn-vote:hover { background: #005cc5; transform: scale(1.03); }
-        .btn-revoke { background: #fff; color: #d73a49; width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #d73a49; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .btn-revoke:hover { background: #fff1f2; transform: scale(1.03); }
+        /* 修复：正圆形调色盘 */
+        .circle-picker {
+            -webkit-appearance: none; border: 2px solid #fff; width: 30px; height: 30px; 
+            border-radius: 50%; cursor: pointer; padding: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s var(--elastic);
+        }
+        .circle-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .circle-picker::-webkit-color-swatch { border-radius: 50%; border: none; }
+        .circle-picker:hover { transform: scale(1.2) rotate(15deg); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease; }
-        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
-        
-        .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid #e4e6eb; }
-        .format-btn { background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 15px; font-family: serif; color: #333; transition: 0.2s; }
-        .format-btn:hover { background: #e4e6eb; border-color: #bbb; }
-        
-        .modal-editor { flex-grow: 1; min-height: 300px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; outline: none; transition: all 0.3s; }
-        .modal-editor:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
-        
-        .modal-actions { margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
-        .btn-close-modal { background: #e4e6eb; color: #333; }
-        
-        .timestamp { font-size: 12px; color: #888; margin-top: 8px; text-align: center; }
-        .admin-controls { display: flex; gap: 10px; justify-content: flex-end; }
-        .image-upload-wrapper { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; }
-        .image-upload-wrapper:hover { border-color: #0366d6; background: #f1f8ff; }
-        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; transition: all 0.3s; }
-        .login-input:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline:none; transform: scale(1.01);}
-        
-        .guide-text { font-size: 16px; line-height: 1.8; color: #333; text-align: left; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        
-        /* 分组样式 */
-        .group-badge { display: inline-block; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-shadow: 0 1px 1px rgba(0,0,0,0.2);}
-        .group-inputs { display: flex; gap: 8px; margin-top: 10px; align-items: center; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e1e4e8; }
-        .group-name-input { font-size: 13px; padding: 6px !important; flex-grow: 1; border: 1px solid #d0d7de !important; border-radius: 4px !important; }
-        .group-color-input { width: 32px; height: 32px; padding: 0; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px #e1e4e8; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
-        .group-color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
-        .group-color-input:hover { transform: scale(1.1); box-shadow: 0 0 0 2px rgba(3,102,214,0.3); }
+        .group-badge { 
+            display: inline-block; padding: 3px 10px; border-radius: 20px; 
+            color: white; font-size: 11px; font-weight: 800; margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
 
+        /* --- 6. 输入框与内容 --- */
+        .title-input { font-weight: bold; border-color: #d1d5da; }
+        .rich-box { 
+            min-height: 140px; border: 1px solid #d1d5da; border-radius: 8px; padding: 12px;
+            text-align: left; font-size: 14px; line-height: 1.6; overflow-y: auto; outline: none;
+        }
+        .rich-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
+        .rich-box img { max-width: 100%; border-radius: 6px; margin: 10px 0; }
+
+        /* --- 7. 投票卡片 (实时变色) --- */
+        .vote-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .vote-card { 
+            background: #fff; border: 1px solid #e1e4e8; border-radius: 16px; padding: 25px; 
+            text-align: center; transition: all 0.4s var(--elastic);
+        }
+        .vote-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .vote-num { font-size: 48px; font-weight: 900; margin: 15px 0; transition: color 0.3s ease; }
+
+        /* --- 8. 按钮体系 --- */
+        .btn { 
+            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s var(--elastic); font-size: 14px;
+        }
+        .btn:active { transform: scale(0.95); }
+        .primary-btn { background: var(--primary); color: white; padding: 12px 25px; }
+        .add-btn { background: #2ea44f; color: white; padding: 12px 25px; }
+        .full-btn { background: #f1f8ff; color: var(--primary); border: 1px solid #c8e1ff; width: 100%; margin-top: 10px; padding: 8px; }
+        .del-btn { background: #fff; color: #d73a49; border: 1px solid #fdb8c0; width: 100%; margin-top: 8px; padding: 6px; font-size: 12px; }
+
+        /* --- 9. 弹窗与编辑器 --- */
+        .overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; 
+            backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal { 
+            background: white; width: 90%; max-width: 900px; padding: 35px; border-radius: 24px; 
+            max-height: 90vh; overflow-y: auto; animation: popIn 0.5s var(--elastic) forwards;
+        }
+        .toolbar { display: flex; gap: 8px; background: #f6f8fa; padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #e1e4e8; }
+        .tool { background: white; border: 1px solid #d1d5da; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .tool:hover { background: #f0f2f5; }
+
+        /* 响应式 */
+        @media (max-width: 768px) { .container { padding: 20px; } .header-tools { position: relative; top: 0; right: 0; margin-bottom: 20px; } }
     </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="loginModal" style="display: flex; opacity: 1;">
-    <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2 style="margin-bottom: 5px;">🔐 系统登录</h2>
-        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">请验证身份以获取编辑权限</p>
-        
-        <input type="text" id="loginUser" class="login-input" placeholder="用户名 (管理员请输入 Infrato)">
-        <input type="password" id="loginPass" class="login-input" placeholder="密码">
-        
-        <div style="text-align: left; margin-bottom: 20px;">
-            <label style="cursor: pointer; color: #555; font-size:14px;"><input type="checkbox" id="rememberMe"> 记住此次登录</label>
+<div class="overlay" id="loginModal" style="display: flex; opacity: 1;">
+    <div class="modal" style="max-width: 450px; text-align: center;">
+        <h2 id="modalHead">🚀 欢迎进入开发面板</h2>
+        <div id="loginForm">
+            <input type="text" id="user" class="rich-box" style="min-height: auto; margin-bottom: 15px;" placeholder="用户名 (管理员请输入 Infrato)">
+            <input type="password" id="pass" class="rich-box" style="min-height: auto; margin-bottom: 20px;" placeholder="密码">
+            <div style="text-align: left; margin-bottom: 20px; font-size: 13px;">
+                <label style="cursor: pointer;"><input type="checkbox" id="saveLogin"> 记住此次登录 (3天内免登)</label>
+            </div>
+            <button class="btn primary-btn" style="width: 100%;" onclick="attemptLogin('admin')">管理员登录</button>
+            <button class="btn" style="width: 100%; margin-top: 10px; background: #eee;" onclick="attemptLogin('guest')">游客进入 (仅查看与投票)</button>
         </div>
-        
-        <div class="modal-actions" style="justify-content: center; flex-direction: column;">
-            <button class="btn btn-save" style="width: 100%; margin-bottom: 10px;" onclick="adminLogin()">管理员登录</button>
-            <button class="btn btn-close-modal" style="width: 100%;" onclick="guestLogin()">游客访问 (仅全屏观看)</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="adminGuideModal">
-    <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2>👑 欢迎回来，管理员</h2>
-        <div class="guide-text">
-            这个网站可以用来更新地图、投票地图想法<br>
-            没有管理员账号的是不会编辑内容的。<br>
-            全屏查看、编辑可以更方便的编辑（而且可以插入图片！）<br>
-            下方会显示时间。<br>
-            为了决定想法是否可靠，请积极投票！🗳️
-        </div>
-        <div class="modal-actions" style="justify-content: center;">
-            <button class="btn btn-save" style="width: 100%;" onclick="closeModal('adminGuideModal')">开始编辑</button>
+        <div id="guideForm" style="display: none; text-align: left;">
+            <p>👋 <strong>管理员你好！</strong></p>
+            <ul style="font-size: 14px; color: #444; line-height: 1.8;">
+                <li><strong>分组功能</strong>：填写相同分组名，颜色会自动同步。</li>
+                <li><strong>全屏编辑</strong>：点击详情可上传高清图片至 GitHub。</li>
+                <li><strong>贝塞尔曲线</strong>：所有交互都经过弹性优化。</li>
+            </ul>
+            <button class="btn primary-btn" style="width: 100%;" onclick="closeModal('loginModal')">知道了，开始工作</button>
         </div>
     </div>
 </div>
 
-<div class="container" id="mainApp" style="display: none;">
-    <div class="top-tools">
-        <div class="tool-btn" title="全网实时在线估算">
-            <div class="online-indicator"></div>
-            <span id="onlineCount">在线: 1</span>
-            <span id="roleBadge" style="margin-left:10px; background:#ffd700; color:#b8860b; padding:2px 8px; border-radius:12px; font-size:12px;"></span>
+<div class="container" id="app" style="display: none;">
+    <div class="header-tools">
+        <div class="badge-btn">
+            <div class="dot"></div>
+            <span id="onlineTag">在线: --</span>
         </div>
-        <button class="tool-btn" onclick="logout()">退出登录</button>
+        <div class="badge-btn logout-btn" onclick="performLogout()">登出账号</div>
     </div>
 
-    <h1>🗺️ 主意征集：地图开发计划</h1>
-    <div id="status" class="status-bar status-ok">正在连接到数据库...</div>
-    
-    <div class="table-wrapper" id="scrollContainer">
+    <h1>🗺️ Map Plan: 主意征集系统</h1>
+    <div id="status" class="status-msg ok">正在连接到 GitHub 数据库...</div>
+
+    <div class="scroll-x">
         <table id="mainTable">
             <thead id="tHead"></thead>
             <tbody id="tBody"></tbody>
         </table>
     </div>
-    
-    <div class="admin-controls" id="adminButtons">
-        <button class="btn btn-add" onclick="addColumn()">+ 向右增加一列</button>
-        <button class="btn btn-save" onclick="manualSave()">💾 手动保存表格内容</button>
+
+    <div id="adminActions" style="display: none; display: flex; justify-content: flex-end; gap: 15px;">
+        <button class="btn add-btn" onclick="addNewIdea()">+ 新增一个地图创意</button>
+        <button class="btn primary-btn" onclick="pushToCloud()">💾 提交所有修改并发布</button>
     </div>
 
-    <hr style="margin: 40px 0; border: 0; border-top: 2px dashed #eee;">
-    <h2>📊 实时计票区</h2>
-    <p style="text-align: center; color: #666; font-size: 14px;">⚠️ 每个想法只能投一次，但你可以支持多个想法。投错可撤回。</p>
-    <div id="voteArea" class="vote-grid"></div>
+    <hr style="margin: 50px 0; border: 0; border-top: 2px dashed #e1e4e8;">
+    <h2>🗳️ 创意计票区 (实时更新颜色)</h2>
+    <div id="voteArea" class="vote-section"></div>
 </div>
 
-<div class="modal-overlay" id="editModal">
-    <div class="modal-content">
-        <h2>🔍 详情内容</h2>
-        
-        <div class="image-upload-wrapper" id="imageUploadArea">
-            <div>
-                <label style="font-weight: bold; font-size: 15px; color: #0366d6;">📁 插入云端图片：</label>
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">图片将直传至 GitHub 仓库，突破字数限制！</p>
+<div class="overlay" id="editorModal">
+    <div class="modal">
+        <h2 id="editTitle">创意详细说明</h2>
+        <div id="adminEditorTools">
+            <div style="background: #f1f8ff; border: 2px dashed #0366d6; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                <p style="margin: 0 0 10px 0; color: #0366d6; font-weight: bold;">📁 上传高清图片 (会自动存入仓库 /images 文件夹)</p>
+                <input type="file" id="imgUpload" accept="image/*" onchange="processImage(event)">
             </div>
-            <input type="file" id="imageInput" accept="image/*" onchange="uploadImageToRepo(event)" style="width: 200px;">
+            <div class="toolbar">
+                <button class="tool" onclick="formatDoc('bold')">B</button>
+                <button class="tool" onclick="formatDoc('italic')">I</button>
+                <button class="tool" onclick="formatDoc('underline')">U</button>
+                <button class="tool" onclick="formatDoc('insertUnorderedList')">• 列表</button>
+                <span style="margin-left: auto; font-size: 12px; color: #888; align-self: center;">编辑结果实时应用</span>
+            </div>
         </div>
-
-        <div class="editor-toolbar" id="textToolbar" style="display: none;">
-            <button class="format-btn" style="font-weight: bold;" onclick="formatText('bold')" title="加粗">B</button>
-            <button class="format-btn" style="font-style: italic;" onclick="formatText('italic')" title="斜体">I</button>
-            <button class="format-btn" style="text-decoration: underline;" onclick="formatText('underline')" title="下划线">U</button>
-            <span style="color: #888; margin-left: auto; font-size: 13px; align-self: center;">在下方直接输入并编辑</span>
-        </div>
-
-        <div id="fullscreenEditor" class="modal-editor" contenteditable="true" placeholder="在这里输入详细内容..."></div>
-        
-        <div id="fullscreenGuestView" class="guest-view-box modal-editor" style="display: none; background: #f8f9fa;" contenteditable="false"></div>
-
-        <div class="modal-actions">
-            <button class="btn btn-close-modal" onclick="closeModal('editModal')">返回</button>
-            <button class="btn btn-save" id="btnSaveFullscreen" onclick="saveFullscreen()">确认并保存</button>
+        <div id="modalEditor" class="rich-box" style="min-height: 450px;" contenteditable="true"></div>
+        <div style="margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 12px;">
+            <button class="btn" style="background: #eee; padding: 10px 30px;" onclick="closeModal('editorModal')">关闭</button>
+            <button class="btn primary-btn" id="modalConfirm" onclick="syncModalBack()">应用更改</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ======= 请配置你的 Token =======
-    const p1 = 'ghp_'; 
-    const p2 = 'YBzj3fro9xQ18P3oRCv89zmM9Pm80j2enZIj'; // <-- 记得填Token！
-    const G_TOKEN = p1 + p2; 
+    /* --- 1. 配置信息 --- */
+    const G_TOKEN = 'ghp_' + '在此输入剩下的Token';
+    const REPO = { owner: 'shivr-dev', name: 'Vote', issue: 1 };
 
-    const REPO_OWNER = 'shivr-dev';
-    const REPO_NAME = 'ideas';
-    const ISSUE_ID = 1; 
-    // ================================
+    let db = { topics: [], contents: [], editTimes: [], votes: [], groups: [], colors: [] };
+    let role = 'guest';
+    let curIdx = -1;
 
-    // 增加了分组数据字段
-    let data = { 
-        topics: ["添加隐藏宝箱", "做个月球地图"], 
-        contents: ["在地图角落放一些彩蛋<br>", "可以在失重环境下跳跃<br>"],
-        editTimes: ["", ""], 
-        votes: [0, 0],
-        groups: ["", ""],          // 新增：分组名称
-        groupColors: ["#0366d6", "#0366d6"] // 新增：分组颜色
+    /* --- 2. 登录与持久化 --- */
+    window.onload = () => {
+        const saved = localStorage.getItem('shivr_role');
+        const expire = localStorage.getItem('shivr_expire');
+        if (saved && expire && Date.now() < expire) {
+            role = saved;
+            launchApp();
+        }
     };
 
-    let currentUserRole = null; 
-    let isFirstLoad = true;
-    let currentEditIndex = -1;
-
-    // --- 登录系统 ---
-    window.onload = function() {
-        const savedRole = localStorage.getItem('userRole');
-        if (savedRole === 'admin') { document.getElementById('rememberMe').checked = true; grantAccess('admin', true); } 
-        else if (savedRole === 'guest') { document.getElementById('rememberMe').checked = true; grantAccess('guest', true); }
-    };
-
-    function adminLogin() {
-        if (document.getElementById('loginUser').value === 'Infrato' && document.getElementById('loginPass').value === 'hajimi') {
-            if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
-            grantAccess('admin', false);
-        } else { alert("用户名或密码错误！"); }
-    }
-
-    function guestLogin() {
-        if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'guest');
-        grantAccess('guest', false);
-    }
-
-    function logout() { localStorage.removeItem('userRole'); location.reload(); }
-
-    function grantAccess(role, isAutoLogin) {
-        currentUserRole = role;
-        // 动画隐藏弹窗
-        document.getElementById('loginModal').style.opacity = '0';
-        setTimeout(() => document.getElementById('loginModal').style.display = 'none', 300);
+    function attemptLogin(type) {
+        if (type === 'admin') {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            if (u === 'Infrato' && p === 'hajimi') role = 'admin';
+            else { alert('验证失败'); return; }
+        }
+        if (document.getElementById('saveLogin').checked) {
+            localStorage.setItem('shivr_role', role);
+            localStorage.setItem('shivr_expire', Date.now() + 3 * 24 * 60 * 60 * 1000);
+        }
         
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('roleBadge').innerText = role === 'admin' ? '👑 管理员' : '👁️ 游客';
-        if (role === 'guest') document.getElementById('adminButtons').style.display = 'none'; 
-        else if (role === 'admin' && !isAutoLogin) openModal('adminGuideModal');
-        
-        loadData(); 
-        setInterval(loadData, 8000); 
-    }
-
-    // --- 数据交互 ---
-    async function loadData() {
-        try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
-            if (!res.ok) throw new Error("网络连接失败");
-            const issue = await res.json();
-            const remoteData = JSON.parse(issue.body);
-            
-            if (remoteData && remoteData.topics) {
-                if (!remoteData.contents) remoteData.contents = remoteData.topics.map(() => "");
-                if (!remoteData.editTimes) remoteData.editTimes = remoteData.topics.map(() => "");
-                // 兼容老数据，如果没有分组信息，自动补全空分组
-                if (!remoteData.groups) remoteData.groups = remoteData.topics.map(() => "");
-                if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
-                
-                data = remoteData;
-                
-                if (isFirstLoad) { renderTable(); isFirstLoad = false; }
-                renderVotes(); updateOnlineCounter();
-                showStatus("✅ 实时同步中 (已连接)", "status-ok");
-            }
-        } catch (e) {
-            if (e.name === 'SyntaxError') saveDataToServer(); 
-            else showStatus("❌ 同步中断: " + e.message, "status-error");
+        if (role === 'admin') {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('guideForm').style.display = 'block';
+            document.getElementById('modalHead').innerText = '🎉 身份验证通过';
+        } else {
+            launchApp();
         }
     }
 
-    async function saveDataToServer() {
-        if (currentUserRole !== 'admin') return; 
-        showStatus("⏳ 正在保存到云端...", "status-ok");
+    function performLogout() { localStorage.clear(); location.reload(); }
+
+    /* --- 3. 数据交互 --- */
+    async function launchApp() {
+        closeModal('loginModal');
+        document.getElementById('app').style.display = 'block';
+        if (role === 'admin') document.getElementById('adminActions').style.display = 'flex';
+        await fetchCloud();
+        setInterval(fetchCloud, 10000); // 10秒背景静默刷新
+        updateOnline();
+    }
+
+    async function fetchCloud() {
         try {
-            await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+            const r = await fetch(`https://api.github.com/repos/${REPO.owner}/${REPO.name}/issues/${REPO.issue}`, {
+                headers: { 'Authorization': `token ${G_TOKEN}` }
+            });
+            const j = await r.json();
+            const cloudData = JSON.parse(j.body);
+            // 数据补全，防止旧版本数据缺失字段
+            db = {
+                topics: cloudData.topics || [],
+                contents: cloudData.contents || [],
+                editTimes: cloudData.editTimes || [],
+                votes: cloudData.votes || [],
+                groups: cloudData.groups || cloudData.topics.map(()=>""),
+                colors: cloudData.colors || cloudData.topics.map(()=>"#0366d6")
+            };
+            renderAll();
+            setUIStatus("✅ 数据已同步到最新版本", "ok");
+        } catch(e) { setUIStatus("❌ 云端同步异常", "err"); }
+    }
+
+    async function pushToCloud() {
+        if (role !== 'admin') return;
+        setUIStatus("⏳ 正在全力上传数据...", "ok");
+        scrapeDOM(); // 提取DOM中的即时修改
+        try {
+            await fetch(`https://api.github.com/repos/${REPO.owner}/${REPO_NAME}/issues/${REPO_ISSUE}`, {
                 method: 'PATCH',
                 headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ body: JSON.stringify(data) })
+                body: JSON.stringify({ body: JSON.stringify(db) })
             });
-            showStatus("✅ 保存成功！所有人可见", "status-ok");
-            renderVotes(); 
-        } catch (e) { showStatus("❌ 保存失败，请检查网络", "status-error"); }
+            setUIStatus("✅ 所有更改已全球发布", "ok");
+            renderAll();
+        } catch(e) { setUIStatus("❌ 发布失败，请检查配置", "err"); }
     }
 
-    // --- 【核心进化】智能分组渲染引擎 ---
-    function renderTable() {
-        const tHead = document.getElementById('tHead');
-        const tBody = document.getElementById('tBody');
-        tHead.innerHTML = ''; tBody.innerHTML = ''; 
-        
-        const tr1 = document.createElement('tr'); 
-        const tr2 = document.createElement('tr'); 
-        const tr3 = document.createElement('tr'); 
+    /* --- 4. 核心渲染 (带排序映射) --- */
+    function renderAll() {
+        const h = document.getElementById('tHead');
+        const b = document.getElementById('tBody');
+        h.innerHTML = ''; b.innerHTML = '';
+        const rows = [document.createElement('tr'), document.createElement('tr'), document.createElement('tr')];
 
-        let th1 = document.createElement('th'); th1.innerText = '1. 编号 (支持分组)'; tr1.appendChild(th1);
-        let th2 = document.createElement('th'); th2.innerText = '2. 主题名称与分类'; tr2.appendChild(th2);
-        let th3 = document.createElement('th'); th3.innerText = '3. 内容详情'; tr3.appendChild(th3);
-
-        // 【智能映射算法】：计算出一个排序后的索引数组，原数据彻底不动！
-        // 这样你怎么删、怎么点，都不会出现错位的情况。
-        let indices = data.topics.map((_, i) => i);
-        indices.sort((a, b) => {
-            let gA = data.groups[a] || "";
-            let gB = data.groups[b] || "";
-            if (gA && !gB) return -1; // 有分组的排前面
-            if (!gA && gB) return 1;
-            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'}); // 同分组排一起
-            return a - b; // 组内按原始编号从小到大排
+        // 排序逻辑：按分组字母序，同组按原编号
+        let map = db.topics.map((_, i) => i).sort((a, b) => {
+            const gA = db.groups[a] || "zzzz"; // 无分组的排最后
+            const gB = db.groups[b] || "zzzz";
+            return gA.localeCompare(gB) || a - b;
         });
 
-        // 按照排好序的索引渲染界面
-        indices.forEach((i) => {
-            let topic = data.topics[i];
-            let groupName = data.groups[i] || "";
-            let groupColor = data.groupColors[i] || "#0366d6";
-            
-            // 编号行 (加入顶部彩色细线)
-            let td1 = document.createElement('td'); 
-            // 如果有分组，顶部显示对应颜色的粗线
-            if (groupName) td1.style.borderTop = `5px solid ${groupColor}`;
-            
-            td1.innerHTML = `<strong style="font-size: 18px; color: ${groupName ? groupColor : '#0366d6'};"># ${i+1}</strong>`; 
-            tr1.appendChild(td1);
-            
-            // 标题与分组行
+        map.forEach(idx => {
+            const group = db.groups[idx] || "";
+            const color = db.colors[idx] || "#0366d6";
+
+            // Row 0: 顶部色条与编号
+            let td0 = document.createElement('td');
+            td0.style.borderTop = group ? `8px solid ${color}` : '1px solid #e1e4e8';
+            td0.innerHTML = `<span style="color:${color}; font-weight:900;"># ${idx+1}</span>`;
+            rows[0].appendChild(td0);
+
+            // Row 1: 标题与分组 (同步变色核心)
+            let td1 = document.createElement('td');
+            if (role === 'admin') {
+                td1.innerHTML = `
+                    <input type="text" id="t_${idx}" class="rich-box title-input" style="min-height:auto;" value="${db.topics[idx]}">
+                    <div class="group-tag-box">
+                        <input type="text" id="g_${idx}" class="rich-box" style="min-height:auto; font-size:12px;" value="${group}" placeholder="分组名" oninput="liveColorSync(${idx})">
+                        <input type="color" id="c_${idx}" class="circle-picker" value="${color}" oninput="liveColorSync(${idx})">
+                    </div>`;
+            } else {
+                td1.innerHTML = group ? `<div class="group-badge" style="background:${color}">${group}</div>` : '';
+                td1.innerHTML += `<div class="rich-box title-input" style="background:#f9f9f9; border:none;">${db.topics[idx] || '待定'}</div>`;
+            }
+            rows[1].appendChild(td1);
+
+            // Row 2: 内容与操作
             let td2 = document.createElement('td');
-            if (currentUserRole === 'admin') {
-                let topicHtml = `<input type="text" id="topic_${i}" value="${topic}" placeholder="输入主题名称">`;
-                // 管理员特有：分组设置面板
-                topicHtml += `
-                    <div class="group-inputs">
-                        <span style="font-size: 12px; color: #666; font-weight: bold;">分组:</span>
-                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" placeholder="名称(不填则无分组)">
-                        <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" title="选择该分组的横条颜色">
-                    </div>
-                `;
-                td2.innerHTML = topicHtml;
-            } else {
-                let html = '';
-                // 游客视角：如果有分组，显示漂亮的颜色徽章
-                if (groupName) {
-                    html += `<div class="group-badge" style="background-color: ${groupColor};">${groupName}</div>`;
-                }
-                html += `<div class="guest-view-box" style="min-height: auto;">${topic || '未命名主题'}</div>`;
-                td2.innerHTML = html;
-            }
-            tr2.appendChild(td2);
-
-            // 内容与按钮行
-            let td3 = document.createElement('td');
-            if (currentUserRole === 'admin') {
-                let contentDiv = document.createElement('div');
-                contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box'; contentDiv.contentEditable = true;
-                contentDiv.innerHTML = data.contents[i]; 
-                td3.appendChild(contentDiv);
-                
-                let toolsDiv = document.createElement('div');
-                toolsDiv.innerHTML = `
-                    <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
-                    <button class="btn-fullscreen" onclick="openFullscreen(${i})">🔍 全屏编辑/插图</button>
-                    <button class="btn-delete-col" onclick="deleteColumn(${i})">🗑️ 删除此列</button>
-                `;
-                td3.appendChild(toolsDiv);
-            } else {
-                let contentDiv = document.createElement('div');
-                contentDiv.className = 'guest-view-box'; contentDiv.innerHTML = data.contents[i];
-                td3.appendChild(contentDiv);
-                
-                let toolsDiv = document.createElement('div');
-                toolsDiv.innerHTML = `
-                    <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
-                    <button class="btn-fullscreen" onclick="openFullscreen(${i})">🔍 全屏查看详情</button>
-                `;
-                td3.appendChild(toolsDiv);
-            }
-            tr3.appendChild(td3);
+            td2.innerHTML = `
+                <div id="con_${idx}" class="rich-box" contenteditable="${role==='admin'}">${db.contents[idx] || ''}</div>
+                <div style="font-size:11px; color:#999; margin-top:10px;">🕒 ${db.editTimes[idx] || '未记录'}</div>
+                <button class="btn full-btn" onclick="openFullEditor(${idx})">🔍 ${role==='admin'?'全屏/插图':'查看详情'}</button>
+                ${role==='admin' ? `<button class="btn del-btn" onclick="removeIdea(${idx})">🗑️ 删除</button>` : ''}`;
+            rows[2].appendChild(td2);
         });
-        
-        tHead.appendChild(tr1);
-        tBody.appendChild(tr2);
-        tBody.appendChild(tr3);
+
+        rows.forEach(r => b.appendChild(r));
+        renderVotes(map);
     }
 
-    function syncDomToData() {
-        const now = new Date();
-        const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    // 分组变色强同步逻辑
+    function liveColorSync(triggerIdx) {
+        const gName = document.getElementById(`g_${triggerIdx}`).value.trim();
+        const gColor = document.getElementById(`c_${triggerIdx}`).value;
         
-        data.topics.forEach((_, i) => {
-            const topicEl = document.getElementById(`topic_${i}`);
-            const contentEl = document.getElementById(`content_${i}`);
-            const groupEl = document.getElementById(`group_${i}`);
-            const colorEl = document.getElementById(`color_${i}`);
-            
-            if (topicEl && contentEl) {
-                const oldContent = data.contents[i];
-                const oldTopic = data.topics[i];
-                const oldGroup = data.groups[i];
-                
-                data.topics[i] = topicEl.value;
-                data.contents[i] = contentEl.innerHTML;
-                
-                if (groupEl && colorEl) {
-                    data.groups[i] = groupEl.value.trim();
-                    data.groupColors[i] = colorEl.value;
-                }
-                
-                if (oldContent !== data.contents[i] || oldTopic !== data.topics[i] || oldGroup !== data.groups[i]) {
-                    data.editTimes[i] = timeString;
-                }
+        if (!gName) return;
+
+        db.topics.forEach((_, i) => {
+            const gi = document.getElementById(`g_${i}`);
+            const ci = document.getElementById(`c_${i}`);
+            if (gi && gi.value.trim() === gName) {
+                ci.value = gColor;
+                // 即时改变表格顶线
+                document.getElementById('tBody').rows[0].cells[i].style.borderTopColor = gColor;
             }
+        });
+        // 即时同步到投票区
+        scrapeDOM(); 
+        renderVotes(db.topics.map((_, i) => i).sort((a,b) => (db.groups[a]||"z").localeCompare(db.groups[b]||"z")));
+    }
+
+    function renderVotes(map) {
+        const area = document.getElementById('voteArea');
+        area.innerHTML = '';
+        const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+
+        map.forEach(idx => {
+            const color = db.colors[idx] || "#0366d6";
+            area.innerHTML += `
+                <div class="vote-card" style="border-top: 6px solid ${color}; animation: slideIn 0.4s var(--elastic);">
+                    ${db.groups[idx] ? `<div class="group-badge" style="background:${color}">${db.groups[idx]}</div>` : ''}
+                    <h3 style="margin:0;">${db.topics[idx] || '无名创意'}</h3>
+                    <div class="vote-num" style="color:${color}">${db.votes[idx]}</div>
+                    <button class="btn" style="width:100%; padding:12px; background:${myVotes[idx]?'#fff':'#0366d6'}; color:${myVotes[idx]?'#d73a49':'#fff'}; border:${myVotes[idx]?'1px solid #d73a49':'none'}" onclick="castVote(${idx})">
+                        ${myVotes[idx] ? '↩ 撤回支持' : '👆 支持想法'}
+                    </button>
+                </div>`;
         });
     }
 
-    function deleteColumn(index) {
-        if (currentUserRole !== 'admin') return;
-        if (!confirm("⚠️ 确定要彻底删除这一列的所有内容和投票吗？操作不可逆！")) return;
-        
-        syncDomToData(); 
-        data.topics.splice(index, 1);
-        data.contents.splice(index, 1);
-        data.editTimes.splice(index, 1);
-        data.votes.splice(index, 1);
-        data.groups.splice(index, 1);
-        data.groupColors.splice(index, 1);
-        
-        renderTable(); saveDataToServer(); 
-    }
-
-    function addColumn() {
-        if (currentUserRole !== 'admin') return;
-        syncDomToData(); 
-        data.topics.push(""); 
-        data.contents.push("<br>"); 
-        data.editTimes.push(""); 
-        data.votes.push(0);
-        data.groups.push(""); 
-        data.groupColors.push("#0366d6"); 
-        
-        renderTable(); saveDataToServer(); 
-        
-        setTimeout(() => {
-            const container = document.getElementById('scrollContainer');
-            container.scrollLeft = container.scrollWidth;
-        }, 100);
-    }
-
-    function formatText(command) {
-        document.execCommand(command, false, null);
-        document.getElementById('fullscreenEditor').focus();
-    }
-
-    async function uploadImageToRepo(event) {
-        const file = event.target.files[0];
+    /* --- 5. 图片直传逻辑 (保留高清压缩) --- */
+    async function processImage(e) {
+        const file = e.target.files[0];
         if (!file) return;
         
-        showStatus("⏳ 正在上传高清图片至 GitHub 云端...", "status-ok");
-        document.getElementById('btnSaveFullscreen').disabled = true;
-        document.getElementById('btnSaveFullscreen').innerText = "图片上传中...";
-
+        setUIStatus("⌛ 正在云端建立图片索引...", "ok");
         const reader = new FileReader();
-        reader.onload = async function(e) {
+        reader.onload = (re) => {
             const img = new Image();
-            img.onload = async function() {
+            img.onload = async () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1000; 
-                let width = img.width; let height = img.height;
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height;
+                const MAX = 1400; // 高清限制
+                let w = img.width, h = img.height;
+                if (w > MAX) { h *= MAX/w; w = MAX; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                const base64DataFull = canvas.toDataURL('image/jpeg', 0.85); 
-                const base64Data = base64DataFull.split(',')[1]; 
-                const filename = `vote_img_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
+                const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+                const fname = `mapimg_${Date.now()}.jpg`;
                 
                 try {
-                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/images/${filename}`, {
+                    const r = await fetch(`https://api.github.com/repos/${REPO.owner}/${REPO.name}/contents/images/${fname}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `[Auto] Upload image via Map Vote App`, content: base64Data })
+                        body: JSON.stringify({ message: "upload image", content: base64 })
                     });
-                    if (!res.ok) throw new Error(`上传失败 (${res.status})`);
-                    
-                    const uploadResult = await res.json();
-                    const imageUrl = uploadResult.content.download_url;
-                    
-                    document.getElementById('fullscreenEditor').focus();
-                    document.execCommand('insertHTML', false, `<br><img src="${imageUrl}" alt="云端图片" style="max-width:100%; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1);"><br>`);
-                    showStatus("✅ 图片已成功上传至云端图床！", "status-ok");
-                } catch (err) {
-                    alert("图片上传失败，请检查 Token 权限或网络：" + err.message);
-                    showStatus("❌ 图片上传失败", "status-error");
-                } finally {
-                    event.target.value = ''; 
-                    document.getElementById('btnSaveFullscreen').disabled = false;
-                    document.getElementById('btnSaveFullscreen').innerText = "确认并保存";
-                }
-            }
-            img.src = e.target.result;
-        }
+                    const res = await r.json();
+                    document.getElementById('modalEditor').focus();
+                    document.execCommand('insertHTML', false, `<img src="${res.content.download_url}" alt="地图图片">`);
+                    setUIStatus("✅ 图片已存入 GitHub 仓库", "ok");
+                } catch(err) { alert("上传失败，检查Token权限"); }
+            };
+            img.src = re.target.result;
+        };
         reader.readAsDataURL(file);
     }
 
-    function openFullscreen(index) {
-        currentEditIndex = index;
-        const isAdmin = currentUserRole === 'admin';
-        
-        document.getElementById('imageUploadArea').style.display = isAdmin ? 'flex' : 'none';
-        document.getElementById('textToolbar').style.display = isAdmin ? 'flex' : 'none';
-        document.getElementById('btnSaveFullscreen').style.display = isAdmin ? 'inline-block' : 'none';
-        
-        if (isAdmin) {
-            document.getElementById('fullscreenEditor').style.display = 'block';
-            document.getElementById('fullscreenGuestView').style.display = 'none';
-            document.getElementById('fullscreenEditor').innerHTML = document.getElementById(`content_${index}`).innerHTML;
-        } else {
-            document.getElementById('fullscreenEditor').style.display = 'none';
-            document.getElementById('fullscreenGuestView').style.display = 'block';
-            document.getElementById('fullscreenGuestView').innerHTML = data.contents[index]; 
-        }
-        
-        openModal('editModal');
-    }
-
-    function saveFullscreen() {
-        if (currentUserRole !== 'admin') return;
-        document.getElementById(`content_${currentEditIndex}`).innerHTML = document.getElementById('fullscreenEditor').innerHTML;
-        closeModal('editModal');
-        manualSave(); 
-    }
-
-    function manualSave() {
-        if (currentUserRole !== 'admin') return;
-        syncDomToData(); 
-        renderTable(); 
-        saveDataToServer();
-    }
-
-    /* --- 投票系统 --- */
-    function getMyVotes() { return JSON.parse(localStorage.getItem('myMapVotes') || '{}'); }
-
-    function renderVotes() {
-        const voteArea = document.getElementById('voteArea');
-        voteArea.innerHTML = '';
-        const myVotes = getMyVotes();
-
-        // 投票区也按照智能映射的分组顺序来展示
-        let indices = data.topics.map((_, i) => i);
-        indices.sort((a, b) => {
-            let gA = data.groups[a] || ""; let gB = data.groups[b] || "";
-            if (gA && !gB) return -1; if (!gA && gB) return 1;
-            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'});
-            return a - b;
-        });
-
-        indices.forEach((i) => {
-            let topic = data.topics[i];
-            let groupName = data.groups[i] || "";
-            let groupColor = data.groupColors[i] || "#0366d6";
-            
-            let btn = myVotes[i] 
-                ? `<button class="btn-revoke" onclick="revokeVote(${i})">↩ 已支持 (点击撤回)</button>` 
-                : `<button class="btn-vote" onclick="castVote(${i})">👆 支持这个想法</button>`;
-            
-            let badgeHtml = groupName ? `<div class="group-badge" style="background-color: ${groupColor}; font-size:11px; margin-bottom:10px;">${groupName}</div>` : '';
-            
-            voteArea.innerHTML += `<div class="vote-card" style="${groupName ? 'border-top: 4px solid '+groupColor+';' : ''}">
-                ${badgeHtml}
-                <h3 style="margin-top:0;">${topic || '未命名'}</h3>
-                <div class="count">${data.votes[i]}</div>
-                ${btn}
-            </div>`;
+    /* --- 6. 辅助工具 --- */
+    function scrapeDOM() {
+        const now = new Date();
+        const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
+        db.topics.forEach((_, i) => {
+            const t = document.getElementById(`t_${i}`);
+            const c = document.getElementById(`con_${i}`);
+            const g = document.getElementById(`g_${i}`);
+            const cl = document.getElementById(`c_${i}`);
+            if (t && (t.value !== db.topics[i] || c.innerHTML !== db.contents[i])) {
+                db.editTimes[i] = timeStr;
+            }
+            if (t) db.topics[i] = t.value;
+            if (c) db.contents[i] = c.innerHTML;
+            if (g) db.groups[i] = g.value.trim();
+            if (cl) db.colors[i] = cl.value;
         });
     }
 
-    function castVote(index) {
-        let myVotes = getMyVotes();
-        if (myVotes[index]) return; 
-        
-        data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
-        fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ body: JSON.stringify(data) })
-        }).then(() => renderVotes());
+    function castVote(i) {
+        let myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+        if (myVotes[i]) { db.votes[i]--; delete myVotes[i]; }
+        else { db.votes[i]++; myVotes[i] = true; }
+        localStorage.setItem('myVotes', JSON.stringify(myVotes));
+        renderAll(); pushToCloud(); // 投票触发即时同步
     }
 
-    function revokeVote(index) {
-        let myVotes = getMyVotes();
-        if (!myVotes[index]) return; 
-        
-        if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
-        fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ body: JSON.stringify(data) })
-        }).then(() => renderVotes());
+    function addNewIdea() {
+        scrapeDOM();
+        db.topics.push(""); db.contents.push(""); db.votes.push(0); 
+        db.groups.push(""); db.colors.push("#0366d6"); db.editTimes.push("");
+        renderAll();
     }
 
-    // 动画弹窗开闭逻辑
-    function openModal(modalId) { 
-        const modal = document.getElementById(modalId);
-        modal.style.display = 'flex'; 
-        setTimeout(() => modal.style.opacity = '1', 10);
+    function removeIdea(i) {
+        if (!confirm('确定彻底移除此创意吗？')) return;
+        scrapeDOM();
+        db.topics.splice(i, 1); db.contents.splice(i, 1);
+        db.votes.splice(i, 1); db.groups.splice(i, 1);
+        db.colors.splice(i, 1); db.editTimes.splice(i, 1);
+        renderAll();
     }
-    function closeModal(modalId) { 
-        const modal = document.getElementById(modalId);
-        modal.style.opacity = '0'; 
-        setTimeout(() => modal.style.display = 'none', 300); // 等待动画结束再隐藏
+
+    function openFullEditor(idx) {
+        curIdx = idx;
+        const isAdmin = (role === 'admin');
+        document.getElementById('editTitle').innerText = isAdmin ? '创意编辑器' : '创意详细内容';
+        document.getElementById('adminEditorTools').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('modalConfirm').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('modalEditor').contentEditable = isAdmin;
+        document.getElementById('modalEditor').innerHTML = db.contents[idx];
+        openModal('editorModal');
     }
-    function showStatus(msg, className) { document.getElementById('status').innerText = msg; document.getElementById('status').className = `status-bar ${className}`; }
-    
-    function updateOnlineCounter() {
-        const totalVotes = data.votes.reduce((a, b) => a + b, 0);
-        document.getElementById('onlineCount').innerText = `在线: ${Math.max(1, Math.floor(totalVotes / 2)) + ((Math.floor(Date.now() / 15000) + totalVotes) % 4)}`;
+
+    function syncModalBack() {
+        document.getElementById(`con_${curIdx}`).innerHTML = document.getElementById('modalEditor').innerHTML;
+        closeModal('editorModal');
+    }
+
+    function openModal(id) { 
+        const m = document.getElementById(id); m.style.display = 'flex'; 
+        setTimeout(()=> m.style.opacity = 1, 10);
+    }
+    function closeModal(id) { 
+        const m = document.getElementById(id); m.style.opacity = 0; 
+        setTimeout(()=> m.style.display = 'none', 300);
+    }
+    function setUIStatus(msg, cls) { const s = document.getElementById('status'); s.innerText = msg; s.className = `status-msg ${cls}`; }
+    function formatDoc(cmd) { document.execCommand(cmd, false, null); }
+    function updateOnline() {
+        const count = Math.floor(Math.random() * 5) + 2;
+        document.getElementById('onlineTag').innerText = `在线: ${count}`;
     }
 </script>
-
 </body>
 </html>
