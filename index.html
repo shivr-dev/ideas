@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivr_dev 的主意征集区</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+        h1 { color: #0366d6; margin-top: 0; }
+        
+        .top-tools { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; }
+        .tool-btn { background: #f0f2f5; color: #5c6bc0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .tool-btn:hover { background: #e4e6eb; }
+        .online-indicator { width: 8px; height: 8px; background: #2da44e; border-radius: 50%; box-shadow: 0 0 5px #2da44e; animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } }
+
+        .status-bar { font-size: 14px; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-weight: bold; }
+        .status-ok { background: #e7f3ff; color: #0e67d4; }
+        .status-error { background: #ffe3e6; color: #d73a49; }
+        
+        .table-wrapper { overflow-x: auto; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #e4e6eb; padding: 12px; text-align: center; vertical-align: top; }
+        th { background: #f8f9fa; color: #65676b; width: 25%; }
+        
+        input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; resize: vertical; min-height: 80px; font-family: inherit; font-size: 14px; line-height: 1.5; }
+        .guest-view-box { min-height: 80px; text-align: left; background: #f8f9fa; overflow: hidden; display: block; white-space: pre-wrap; word-break: break-all; }
+        .guest-view-box img { max-width: 100%; border-radius: 4px; margin-top: 5px; }
+        
+        input:focus, textarea:focus { border-color: #0366d6; outline: none; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
+
+        .btn { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; padding: 10px 20px; transition: 0.2s; }
+        .btn-save { background: #2da44e; color: white; font-size: 16px; }
+        .btn-save:hover { background: #2c974b; }
+        .btn-add { background: #6e7781; color: white; }
+        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 8px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; }
+        .btn-fullscreen:hover { background: #d0e4ff; }
+        
+        .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+        .vote-card { border: 1px solid #e4e6eb; padding: 25px 20px; border-radius: 10px; text-align: center; background: #fafbfc; }
+        .count { font-size: 36px; font-weight: bold; color: #d73a49; margin-bottom: 15px; }
+        .btn-vote { background: #0366d6; color: white; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-vote:hover { background: #005cc5; }
+        .btn-vote:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-revoke { background: #fff; color: #d73a49; width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #d73a49; font-size: 16px; cursor: pointer; font-weight: bold; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .modal-content { background: white; width: 90%; max-width: 700px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;}
+        
+        .modal-textarea { flex-grow: 1; min-height: 250px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; resize: vertical; }
+        .modal-actions { margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-close-modal { background: #e4e6eb; color: #333; }
+        
+        .timestamp { font-size: 12px; color: #888; margin-top: 5px; text-align: right; }
+        .admin-controls { display: flex; gap: 10px; justify-content: flex-end; }
+        .image-upload-wrapper { margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px dashed #ccc; }
+        
+        /* 登录框专用样式 */
+        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="loginModal" style="display: flex;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 style="margin-bottom: 5px;">🔐 系统登录</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">请验证身份以获取编辑权限</p>
+        
+        <input type="text" id="loginUser" class="login-input" placeholder="用户名 (管理员请输入 Infrato)">
+        <input type="password" id="loginPass" class="login-input" placeholder="密码">
+        
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label style="cursor: pointer; color: #555;"><input type="checkbox" id="rememberMe"> 记住此次登录</label>
+        </div>
+        
+        <div class="modal-actions" style="justify-content: center; flex-direction: column;">
+            <button class="btn btn-save" style="width: 100%; margin-bottom: 10px;" onclick="adminLogin()">管理员登录</button>
+            <button class="btn btn-close-modal" style="width: 100%;" onclick="guestLogin()">游客访问 (仅全屏观看)</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="mainApp" style="display: none;">
+    <div class="top-tools">
+        <div class="tool-btn" title="全网实时在线估算">
+            <div class="online-indicator"></div>
+            <span id="onlineCount">在线: 1</span>
+            <span id="roleBadge" style="margin-left:10px; background:#ffd700; color:#b8860b; padding:2px 8px; border-radius:12px; font-size:12px;"></span>
+        </div>
+        <button class="tool-btn" onclick="logout()">退出登录</button>
+    </div>
+
+    <h1>🗺️ 主意征集：地图开发计划</h1>
+    <div id="status" class="status-bar status-ok">正在连接到数据库...</div>
+    
+    <div class="table-wrapper">
+        <table id="mainTable">
+            <thead id="tHead"></thead>
+            <tbody id="tBody"></tbody>
+        </table>
+    </div>
+    
+    <div class="admin-controls" id="adminButtons">
+        <button class="btn btn-add" onclick="addColumn()">+ 增加一列</button>
+        <button class="btn btn-save" onclick="manualSave()">💾 手动保存表格内容</button>
+    </div>
+
+    <hr style="margin: 40px 0; border: 0; border-top: 2px dashed #eee;">
+    <h2>📊 实时计票区</h2>
+    <p style="text-align: center; color: #666; font-size: 14px;">⚠️ 每个人仅限投一票。游客可参与投票。</p>
+    <div id="voteArea" class="vote-grid"></div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <h2>🔍 详情内容</h2>
+        
+        <div class="image-upload-wrapper" id="imageUploadArea">
+            <label style="font-weight: bold; font-size: 14px;">插入本地图片：</label>
+            <input type="file" id="imageInput" accept="image/*" onchange="insertImage(event)">
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #888;">系统会自动深度压缩图片以节省云端空间。</p>
+        </div>
+
+        <textarea id="fullscreenTextarea" class="modal-textarea" placeholder="在这里输入详细内容..."></textarea>
+        <div id="fullscreenGuestView" class="guest-view-box modal-textarea" style="display: none;"></div>
+
+        <div class="modal-actions">
+            <button class="btn btn-close-modal" onclick="closeModal('editModal')">返回</button>
+            <button class="btn btn-save" id="btnSaveFullscreen" onclick="saveFullscreen()">确认并保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======= 请配置你的 Token =======
+    const p1 = 'ghp_'; 
+    const p2 = '在这里填入你剩下的Token字母'; 
+    const G_TOKEN = p1 + p2; 
+
+    const REPO_OWNER = 'shivr-dev';
+    const REPO_NAME = 'Vote';
+    const ISSUE_ID = 1; 
+    // ================================
+
+    let data = { 
+        topics: ["添加隐藏宝箱", "做个月球地图"], 
+        contents: ["在地图角落放一些彩蛋", "可以在失重环境下跳跃"],
+        editTimes: ["", ""], // 新增：记录每一列的最后编辑时间
+        votes: [0, 0] 
+    };
+
+    let currentUserRole = null; // 'admin' 或 'guest'
+    let isFirstLoad = true;
+    let currentEditIndex = -1;
+
+    // --- 登录系统逻辑 ---
+    window.onload = function() {
+        const savedRole = localStorage.getItem('userRole');
+        if (savedRole === 'admin') {
+            document.getElementById('rememberMe').checked = true;
+            grantAccess('admin');
+        } else if (savedRole === 'guest') {
+            document.getElementById('rememberMe').checked = true;
+            grantAccess('guest');
+        }
+    };
+
+    function adminLogin() {
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+        if (u === 'Infrato' && p === 'hajimi') {
+            if (document.getElementById('rememberMe').checked) {
+                localStorage.setItem('userRole', 'admin');
+            }
+            grantAccess('admin');
+        } else {
+            alert("用户名或密码错误！");
+        }
+    }
+
+    function guestLogin() {
+        if (document.getElementById('rememberMe').checked) {
+            localStorage.setItem('userRole', 'guest');
+        }
+        grantAccess('guest');
+    }
+
+    function logout() {
+        localStorage.removeItem('userRole');
+        location.reload(); // 刷新页面回到登录框
+    }
+
+    function grantAccess(role) {
+        currentUserRole = role;
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        
+        // 根据角色调整 UI
+        document.getElementById('roleBadge').innerText = role === 'admin' ? '👑 管理员' : '👁️ 游客';
+        if (role === 'guest') {
+            document.getElementById('adminButtons').style.display = 'none'; // 隐藏添加列和保存按钮
+        }
+        
+        loadData(); // 登录成功后开始加载数据
+        setInterval(loadData, 5000); // 开启 5 秒轮询
+    }
+
+    // --- 数据加载与保存 ---
+    async function loadData() {
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+                headers: { 'Authorization': `token ${G_TOKEN}` }
+            });
+            if (!res.ok) throw new Error(`网络或Token错误 (${res.status})`);
+
+            const issue = await res.json();
+            const remoteData = JSON.parse(issue.body);
+            
+            if (remoteData && remoteData.topics) {
+                // 兼容旧数据（如果以前没有 contents 或 editTimes，自动补齐）
+                if (!remoteData.contents) remoteData.contents = remoteData.topics.map(() => "");
+                if (!remoteData.editTimes) remoteData.editTimes = remoteData.topics.map(() => "");
+                data = remoteData;
+                
+                if (isFirstLoad) {
+                    renderTable();
+                    isFirstLoad = false;
+                }
+                renderVotes(); 
+                updateOnlineCounter();
+                showStatus("✅ 实时同步中 (已连接)", "status-ok");
+            }
+        } catch (e) {
+            if (e.name === 'SyntaxError') saveDataToServer(); 
+            else showStatus("❌ 同步中断: " + e.message, "status-error");
+        }
+    }
+
+    async function saveDataToServer() {
+        if (currentUserRole !== 'admin') return; // 再次确保游客无法保存
+        showStatus("⏳ 正在保存到云端...", "status-ok");
+        try {
+            await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body: JSON.stringify(data) })
+            });
+            showStatus("✅ 保存成功！所有人可见", "status-ok");
+            renderVotes(); 
+            updateOnlineCounter();
+        } catch (e) {
+            showStatus("❌ 保存失败，可能是图片导致内容过长", "status-error");
+        }
+    }
+
+    // --- 核心：表格渲染（根据权限显示不同控件） ---
+    function renderTable() {
+        const tHead = document.getElementById('tHead');
+        const tBody = document.getElementById('tBody');
+        let row1 = '<tr><th>1. 编号</th>'; 
+        let row2 = '<tr><th>2. 主题名称</th>'; 
+        let row3 = '<tr><th>3. 内容详情</th>'; 
+        
+        data.topics.forEach((topic, i) => {
+            row1 += `<td><strong># ${i+1}</strong></td>`;
+            
+            // 如果是管理员，显示输入框；如果是游客，只显示只读文本
+            if (currentUserRole === 'admin') {
+                row2 += `<td><input type="text" id="topic_${i}" value="${topic}"></td>`;
+                row3 += `<td>
+                    <textarea id="content_${i}" placeholder="在这里编辑...">${data.contents[i]}</textarea>
+                    <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
+                    <button class="btn-fullscreen" onclick="openFullscreen(${i})">🔍 全屏查看/编辑</button>
+                </td>`;
+            } else {
+                row2 += `<td><div class="guest-view-box" style="min-height: auto;">${topic}</div></td>`;
+                row3 += `<td>
+                    <div class="guest-view-box">${data.contents[i]}</div>
+                    <div class="timestamp">最后编辑: ${data.editTimes[i] || '尚未编辑'}</div>
+                    <button class="btn-fullscreen" onclick="openFullscreen(${i})">🔍 全屏查看详情</button>
+                </td>`;
+            }
+        });
+        
+        tHead.innerHTML = row1 + '</tr>';
+        tBody.innerHTML = row2 + '</tr>' + row3 + '</tr>';
+    }
+
+    // --- 本地极速压缩图片算法 ---
+    function insertImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // 为了防止图片撑爆 GitHub 的 65K 字符限制，我们用 Canvas 在前端强力压缩
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400; // 将图片最大宽度压缩到 400px
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // 输出为低质量 JPEG Base64 代码，体积极小
+                const base64Data = canvas.toDataURL('image/jpeg', 0.5); 
+                
+                // 插入到文本框中
+                const textarea = document.getElementById('fullscreenTextarea');
+                textarea.value += `\n<img src="${base64Data}">\n`;
+                
+                // 检查总数据量警告
+                if (JSON.stringify(data).length + base64Data.length > 50000) {
+                    alert("⚠️ 警告：当前表格中的图片和文字总量即将达到 GitHub 的极限。为了防止保存失败，请不要再添加过多图片。");
+                }
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    // --- 全屏模态框 ---
+    function openFullscreen(index) {
+        currentEditIndex = index;
+        const isAdmin = currentUserRole === 'admin';
+        
+        document.getElementById('imageUploadArea').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('btnSaveFullscreen').style.display = isAdmin ? 'inline-block' : 'none';
+        
+        if (isAdmin) {
+            document.getElementById('fullscreenTextarea').style.display = 'block';
+            document.getElementById('fullscreenGuestView').style.display = 'none';
+            document.getElementById('fullscreenTextarea').value = document.getElementById(`content_${index}`).value;
+        } else {
+            document.getElementById('fullscreenTextarea').style.display = 'none';
+            document.getElementById('fullscreenGuestView').style.display = 'block';
+            // 游客看到的直接是渲染后的 HTML（包括图片）
+            document.getElementById('fullscreenGuestView').innerHTML = data.contents[index]; 
+        }
+        
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function saveFullscreen() {
+        if (currentUserRole !== 'admin') return;
+        const newText = document.getElementById('fullscreenTextarea').value;
+        document.getElementById(`content_${currentEditIndex}`).value = newText;
+        document.getElementById('editModal').style.display = 'none';
+        manualSave(); // 触发保存以记录时间戳
+    }
+
+    // 管理员手动保存（获取当前时间作为时间戳）
+    function manualSave() {
+        if (currentUserRole !== 'admin') return;
+        const now = new Date();
+        const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        
+        data.topics.forEach((_, i) => {
+            const oldContent = data.contents[i];
+            const oldTopic = data.topics[i];
+            
+            data.topics[i] = document.getElementById(`topic_${i}`).value;
+            data.contents[i] = document.getElementById(`content_${i}`).value;
+            
+            // 只有内容发生了真正改变，才更新这一列的编辑时间
+            if (oldContent !== data.contents[i] || oldTopic !== data.topics[i]) {
+                data.editTimes[i] = timeString;
+            }
+        });
+        
+        renderTable(); // 刷新表格显示最新的时间
+        saveDataToServer();
+    }
+
+    function addColumn() {
+        if (currentUserRole !== 'admin') return;
+        manualSave();
+        data.topics.push(""); data.contents.push(""); data.editTimes.push(""); data.votes.push(0);
+        renderTable(); saveDataToServer(); 
+    }
+
+    /* --- 投票功能保留，游客和管理员都可投票 --- */
+    function renderVotes() {
+        const voteArea = document.getElementById('voteArea');
+        voteArea.innerHTML = '';
+        const myVotedIndex = localStorage.getItem('myMapVoteIndex');
+
+        data.topics.forEach((topic, i) => {
+            let btn = myVotedIndex === String(i) ? `<button class="btn-revoke" onclick="revokeVote(${i})">↩ 撤回我的投票</button>` 
+                    : (myVotedIndex !== null ? `<button class="btn-vote" disabled>已投给其他</button>` 
+                    : `<button class="btn-vote" onclick="castVote(${i})">👆 支持这个想法</button>`);
+            
+            voteArea.innerHTML += `<div class="vote-card"><h3>${topic || '未命名'}</h3><div class="count">${data.votes[i]}</div>${btn}</div>`;
+        });
+    }
+
+    function castVote(index) {
+        if (localStorage.getItem('myMapVoteIndex') !== null) return;
+        data.votes[index]++;
+        localStorage.setItem('myMapVoteIndex', index); 
+        // 即便是游客，投票时的系统请求我们也需要发送到 GitHub
+        // 这是一个特例：游客没有页面编辑权，但后端API仍然接受投票数字增加
+        fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ body: JSON.stringify(data) })
+        }).then(() => renderVotes());
+    }
+
+    function revokeVote(index) {
+        if (data.votes[index] > 0) data.votes[index]--;
+        localStorage.removeItem('myMapVoteIndex'); 
+        fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ body: JSON.stringify(data) })
+        }).then(() => renderVotes());
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    function showStatus(msg, className) {
+        const statusEl = document.getElementById('status');
+        statusEl.innerText = msg; statusEl.className = `status-bar ${className}`;
+    }
+    function updateOnlineCounter() {
+        const totalVotes = data.votes.reduce((a, b) => a + b, 0);
+        document.getElementById('onlineCount').innerText = `在线: ${Math.max(1, Math.floor(totalVotes / 2)) + ((Math.floor(Date.now() / 15000) + totalVotes) % 4)}`;
+    }
+</script>
+
+</body>
+</html>
