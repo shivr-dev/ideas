@@ -5,104 +5,524 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>主意征集区</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
+        /* ==========================================
+           1. 基础全局样式
+        ========================================== */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            padding: 20px; 
+            color: #1c1e21; 
+        }
         
         /* 动画核心：弹性贝塞尔曲线 */
-        .container { max-width: 1150px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        h1 { color: #0366d6; margin-top: 0; }
+        .container { 
+            max-width: 1150px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            position: relative; 
+            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
         
-        .top-tools { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; }
-        .tool-btn { background: #f0f2f5; color: #5c6bc0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; gap: 5px; }
-        .tool-btn:hover { background: #e4e6eb; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .online-indicator { width: 8px; height: 8px; background: #2da44e; border-radius: 50%; box-shadow: 0 0 5px #2da44e; animation: pulse 2s infinite; }
+        h1 { 
+            color: #0366d6; 
+            margin-top: 0; 
+        }
 
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } }
+        /* ==========================================
+           2. 顶部工具栏与状态
+        ========================================== */
+        .top-tools { 
+            position: absolute; 
+            top: 30px; 
+            right: 30px; 
+            display: flex; 
+            gap: 10px; 
+        }
         
-        /* 弹窗果冻动画 */
+        .tool-btn { 
+            background: #f0f2f5; 
+            color: #5c6bc0; 
+            border: none; 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        
+        .tool-btn:hover { 
+            background: #e4e6eb; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+        
+        .online-indicator { 
+            width: 8px; 
+            height: 8px; 
+            background: #2da44e; 
+            border-radius: 50%; 
+            box-shadow: 0 0 5px #2da44e; 
+            animation: pulse 2s infinite; 
+        }
+
+        @keyframes pulse { 
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.7); } 
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); } 
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); } 
+        }
+        
         @keyframes popIn {
             0% { opacity: 0; transform: scale(0.8) translateY(30px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .status-bar { font-size: 14px; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-weight: bold; transition: all 0.3s ease; }
+        .status-bar { 
+            font-size: 14px; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            transition: all 0.3s ease; 
+        }
+        
         .status-ok { background: #e7f3ff; color: #0e67d4; }
         .status-error { background: #ffe3e6; color: #d73a49; }
         
-        .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; scroll-behavior: smooth; }
+        /* ==========================================
+           3. 表格与内容展示系统
+        ========================================== */
+        .table-wrapper { 
+            overflow-x: auto; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            scroll-behavior: smooth; 
+        }
+        
         .table-wrapper::-webkit-scrollbar { height: 10px; }
         .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 5px; }
         .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; transition: 0.3s; }
         .table-wrapper::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
-        table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: max-content; }
+        table { 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            table-layout: fixed; 
+            width: max-content; 
+        }
         
-        /* 分组顶部的颜色细线 */
-        th, td { border: 1px solid #e4e6eb; padding: 15px; text-align: center; vertical-align: top; width: 260px; min-width: 260px; max-width: 260px; word-wrap: break-word; transition: all 0.3s ease; background: #fff;}
+        th, td { 
+            border: 1px solid #e4e6eb; 
+            padding: 15px; 
+            text-align: center; 
+            vertical-align: top; 
+            width: 260px; 
+            min-width: 260px; 
+            max-width: 260px; 
+            word-wrap: break-word; 
+            transition: all 0.3s ease; 
+            background: #fff;
+        }
+        
         th { background: #f8f9fa; color: #65676b; }
         
-        input[type="text"], .guest-view-box { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; transition: border 0.3s ease, box-shadow 0.3s ease; }
-        input[type="text"]:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline: none;}
+        /* ==========================================
+           4. 输入控件与富文本框
+        ========================================== */
+        input[type="text"], .guest-view-box { 
+            width: 100%; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            font-size: 15px; 
+            transition: border 0.3s ease, box-shadow 0.3s ease; 
+        }
         
-        .editor-box { width: 100%; min-height: 120px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; text-align: left; background: #fff; overflow-y: auto; font-size: 14px; line-height: 1.5; outline: none; transition: all 0.3s ease; }
-        .editor-box:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
-        .editor-box img { max-width: 100%; border-radius: 4px; margin: 5px 0; cursor: pointer; transition: transform 0.2s; }
+        input[type="text"]:focus { 
+            border-color: #0366d6; 
+            box-shadow: 0 0 0 3px rgba(3,102,214,0.1); 
+            outline: none;
+        }
+        
+        .editor-box { 
+            width: 100%; 
+            min-height: 120px; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            text-align: left; 
+            background: #fff; 
+            overflow-y: auto; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            outline: none; 
+            transition: all 0.3s ease; 
+        }
+        
+        .editor-box:focus { 
+            border-color: #0366d6; 
+            box-shadow: 0 0 0 3px rgba(3,102,214,0.1); 
+        }
+        
+        .editor-box img { 
+            max-width: 100%; 
+            border-radius: 4px; 
+            margin: 5px 0; 
+            cursor: pointer; 
+            transition: transform 0.2s; 
+        }
+        
         .editor-box img:hover { transform: scale(1.02); }
         
-        .guest-view-box { min-height: 120px; text-align: left; background: #f8f9fa; overflow: hidden; display: block; white-space: pre-wrap; word-break: break-all; }
-        .guest-view-box img { max-width: 100%; border-radius: 4px; margin-top: 5px; }
+        .guest-view-box { 
+            min-height: 120px; 
+            text-align: left; 
+            background: #f8f9fa; 
+            overflow: hidden; 
+            display: block; 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+        }
+        
+        .guest-view-box img { 
+            max-width: 100%; 
+            border-radius: 4px; 
+            margin-top: 5px; 
+        }
 
-        .btn { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; padding: 10px 20px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .btn:active { transform: translateY(0) scale(0.98); box-shadow: none; }
+        /* ==========================================
+           5. 按钮样式集合
+        ========================================== */
+        .btn { 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            padding: 10px 20px; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
+        .btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+        }
+        
+        .btn:active { 
+            transform: translateY(0) scale(0.98); 
+            box-shadow: none; 
+        }
         
         .btn-save { background: #2da44e; color: white; font-size: 16px; }
         .btn-add { background: #6e7781; color: white; }
-        .btn-delete-col { background: #fff; color: #d73a49; font-size: 13px; padding: 6px 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ffc1c6; cursor: pointer; width: 100%; transition: all 0.2s; font-weight: bold; }
-        .btn-delete-col:hover { background: #ffe3e6; transform: scale(1.02); }
-        .btn-fullscreen { background: #e7f3ff; color: #0366d6; margin-top: 10px; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #bbd6fe; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; }
-        .btn-fullscreen:hover { background: #d0e4ff; transform: scale(1.02); }
         
-        /* 投票卡片悬浮动画 */
-        .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
-        .vote-card { border: 1px solid #e4e6eb; padding: 25px 20px; border-radius: 10px; text-align: center; background: #fafbfc; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .vote-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.08); border-color: #c8e1ff; }
+        .btn-delete-col { 
+            background: #fff; 
+            color: #d73a49; 
+            font-size: 13px; 
+            padding: 6px 8px; 
+            margin-top: 8px; 
+            border-radius: 4px; 
+            border: 1px solid #ffc1c6; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: all 0.2s; 
+            font-weight: bold; 
+        }
         
-        .count { font-size: 36px; font-weight: bold; color: #d73a49; margin-bottom: 15px; transition: color 0.3s; }
-        .btn-vote { background: #0366d6; color: white; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-delete-col:hover { 
+            background: #ffe3e6; 
+            transform: scale(1.02); 
+        }
+        
+        .btn-fullscreen { 
+            background: #e7f3ff; 
+            color: #0366d6; 
+            margin-top: 10px; 
+            width: 100%; 
+            padding: 6px; 
+            border-radius: 4px; 
+            border: 1px solid #bbd6fe; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: bold; 
+            transition: all 0.2s; 
+        }
+        
+        .btn-fullscreen:hover { 
+            background: #d0e4ff; 
+            transform: scale(1.02); 
+        }
+        
+        /* ==========================================
+           6. 投票卡片系统
+        ========================================== */
+        .vote-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 15px; 
+            margin-top: 20px; 
+        }
+        
+        .vote-card { 
+            border: 1px solid #e4e6eb; 
+            padding: 25px 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            background: #fafbfc; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
+        .vote-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08); 
+            border-color: #c8e1ff; 
+        }
+        
+        .count { 
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #d73a49; 
+            margin-bottom: 15px; 
+            transition: color 0.3s; 
+        }
+        
+        .btn-vote { 
+            background: #0366d6; 
+            color: white; 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
         .btn-vote:hover { background: #005cc5; transform: scale(1.03); }
-        .btn-revoke { background: #fff; color: #d73a49; width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #d73a49; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        .btn-revoke { 
+            background: #fff; 
+            color: #d73a49; 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border: 1px solid #d73a49; 
+            font-size: 16px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
         .btn-revoke:hover { background: #fff1f2; transform: scale(1.03); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease; }
-        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
+        /* ==========================================
+           7. 模态弹窗系统
+        ========================================== */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+            backdrop-filter: blur(4px); 
+            opacity: 0; 
+            transition: opacity 0.3s ease; 
+        }
         
-        .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid #e4e6eb; }
-        .format-btn { background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 15px; font-family: serif; color: #333; transition: 0.2s; }
+        .modal-content { 
+            background: white; 
+            width: 90%; 
+            max-width: 800px; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        .editor-toolbar { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 10px; 
+            background: #f8f9fa; 
+            padding: 8px; 
+            border-radius: 6px; 
+            border: 1px solid #e4e6eb; 
+        }
+        
+        .format-btn { 
+            background: white; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            padding: 5px 12px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-family: serif; 
+            color: #333; 
+            transition: 0.2s; 
+        }
+        
         .format-btn:hover { background: #e4e6eb; border-color: #bbb; }
         
-        .modal-editor { flex-grow: 1; min-height: 300px; width: 100%; font-size: 16px; padding: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y: auto; text-align: left; outline: none; transition: all 0.3s; }
+        .modal-editor { 
+            flex-grow: 1; 
+            min-height: 300px; 
+            width: 100%; 
+            font-size: 16px; 
+            padding: 15px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            background: #fff; 
+            overflow-y: auto; 
+            text-align: left; 
+            outline: none; 
+            transition: all 0.3s; 
+        }
+        
         .modal-editor:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); }
         
-        .modal-actions { margin-top: 25px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-actions { 
+            margin-top: 25px; 
+            text-align: right; 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 10px; 
+        }
+        
         .btn-close-modal { background: #e4e6eb; color: #333; }
         
         .timestamp { font-size: 12px; color: #888; margin-top: 8px; text-align: center; }
         .admin-controls { display: flex; gap: 10px; justify-content: flex-end; }
-        .image-upload-wrapper { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; }
+        
+        .image-upload-wrapper { 
+            margin-bottom: 15px; 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 6px; 
+            border: 1px dashed #ccc; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            transition: all 0.3s; 
+        }
+        
         .image-upload-wrapper:hover { border-color: #0366d6; background: #f1f8ff; }
-        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; transition: all 0.3s; }
-        .login-input:focus { border-color: #0366d6; box-shadow: 0 0 0 3px rgba(3,102,214,0.1); outline:none; transform: scale(1.01);}
         
-        .guide-text { font-size: 16px; line-height: 1.8; color: #333; text-align: left; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .login-input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+            transition: all 0.3s; 
+        }
         
-        /* 分组样式 */
-        .group-badge { display: inline-block; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-shadow: 0 1px 1px rgba(0,0,0,0.2);}
-        .group-inputs { display: flex; gap: 8px; margin-top: 10px; align-items: center; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e1e4e8; }
-        .group-name-input { font-size: 13px; padding: 6px !important; flex-grow: 1; border: 1px solid #d0d7de !important; border-radius: 4px !important; }
-        .group-color-input { width: 32px; height: 32px; padding: 0; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px #e1e4e8; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
-        .group-color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
-        .group-color-input:hover { transform: scale(1.1); box-shadow: 0 0 0 2px rgba(3,102,214,0.3); }
+        .login-input:focus { 
+            border-color: #0366d6; 
+            box-shadow: 0 0 0 3px rgba(3,102,214,0.1); 
+            outline:none; 
+            transform: scale(1.01);
+        }
+        
+        .guide-text { 
+            font-size: 16px; 
+            line-height: 1.8; 
+            color: #333; 
+            text-align: left; 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+        }
+        
+        /* ==========================================
+           8. 分组徽章与颜色控件 (修复为完美圆形)
+        ========================================== */
+        .group-badge { 
+            display: inline-block; 
+            font-size: 12px; 
+            font-weight: bold; 
+            padding: 3px 8px; 
+            border-radius: 12px; 
+            margin-bottom: 8px; 
+            color: #fff; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        
+        .group-inputs { 
+            display: flex; 
+            gap: 8px; 
+            margin-top: 10px; 
+            align-items: center; 
+            background: #f8f9fa; 
+            padding: 6px; 
+            border-radius: 6px; 
+            border: 1px solid #e1e4e8; 
+        }
+        
+        .group-name-input { 
+            font-size: 13px; 
+            padding: 6px !important; 
+            flex-grow: 1; 
+            border: 1px solid #d0d7de !important; 
+            border-radius: 4px !important; 
+        }
+        
+        /* 🔥 完美正圆形颜色拾取器修复 */
+        .group-color-input { 
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            width: 30px !important; 
+            height: 30px !important; 
+            padding: 0; 
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            box-shadow: 0 0 0 1px #e1e4e8; 
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            background-color: transparent;
+            overflow: hidden; /* 确保内容不溢出 */
+        }
+        
+        .group-color-input::-webkit-color-swatch-wrapper { 
+            padding: 0; 
+        }
+        
+        .group-color-input::-webkit-color-swatch { 
+            border: none; 
+            border-radius: 50%; 
+        }
+        
+        .group-color-input::-moz-color-swatch { 
+            border: none; 
+            border-radius: 50%; 
+        }
+        
+        .group-color-input:hover { 
+            transform: scale(1.15); 
+            box-shadow: 0 0 0 2px rgba(3,102,214,0.3); 
+        }
 
     </style>
 </head>
@@ -215,86 +635,122 @@
     const ISSUE_ID = 1; 
     // ================================
 
-    // 增加了分组数据字段
+    // 核心数据结构
     let data = { 
         topics: ["添加隐藏宝箱", "做个月球地图"], 
         contents: ["在地图角落放一些彩蛋<br>", "可以在失重环境下跳跃<br>"],
         editTimes: ["", ""], 
         votes: [0, 0],
-        groups: ["", ""],          // 新增：分组名称
-        groupColors: ["#0366d6", "#0366d6"] // 新增：分组颜色
+        groups: ["", ""],          
+        groupColors: ["#0366d6", "#0366d6"] 
     };
 
     let currentUserRole = null; 
     let isFirstLoad = true;
     let currentEditIndex = -1;
 
-    // --- 登录系统 ---
+    // --- 页面初始化加载 ---
     window.onload = function() {
         const savedRole = localStorage.getItem('userRole');
-        if (savedRole === 'admin') { document.getElementById('rememberMe').checked = true; grantAccess('admin', true); } 
-        else if (savedRole === 'guest') { document.getElementById('rememberMe').checked = true; grantAccess('guest', true); }
+        if (savedRole === 'admin') { 
+            document.getElementById('rememberMe').checked = true; 
+            grantAccess('admin', true); 
+        } 
+        else if (savedRole === 'guest') { 
+            document.getElementById('rememberMe').checked = true; 
+            grantAccess('guest', true); 
+        }
     };
 
+    // --- 权限管理与登录逻辑 ---
     function adminLogin() {
-        if (document.getElementById('loginUser').value === 'Infrato' && document.getElementById('loginPass').value === 'hajimi') {
-            if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
+        if (user === 'Infrato' && pass === 'hajimi') {
+            if (document.getElementById('rememberMe').checked) {
+                localStorage.setItem('userRole', 'admin');
+            }
             grantAccess('admin', false);
-        } else { alert("用户名或密码错误！"); }
+        } else { 
+            alert("用户名或密码错误！"); 
+        }
     }
 
     function guestLogin() {
-        if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'guest');
+        if (document.getElementById('rememberMe').checked) {
+            localStorage.setItem('userRole', 'guest');
+        }
         grantAccess('guest', false);
     }
 
-    function logout() { localStorage.removeItem('userRole'); location.reload(); }
+    function logout() { 
+        localStorage.removeItem('userRole'); 
+        location.reload(); 
+    }
 
     function grantAccess(role, isAutoLogin) {
         currentUserRole = role;
-        // 动画隐藏弹窗
+        
+        // 平滑隐藏登录弹窗
         document.getElementById('loginModal').style.opacity = '0';
-        setTimeout(() => document.getElementById('loginModal').style.display = 'none', 300);
+        setTimeout(() => {
+            document.getElementById('loginModal').style.display = 'none';
+        }, 300);
         
         document.getElementById('mainApp').style.display = 'block';
         document.getElementById('roleBadge').innerText = role === 'admin' ? '👑 管理员' : '👁️ 游客';
-        if (role === 'guest') document.getElementById('adminButtons').style.display = 'none'; 
-        else if (role === 'admin' && !isAutoLogin) openModal('adminGuideModal');
+        
+        if (role === 'guest') {
+            document.getElementById('adminButtons').style.display = 'none'; 
+        } else if (role === 'admin' && !isAutoLogin) {
+            openModal('adminGuideModal');
+        }
         
         loadData(); 
         setInterval(loadData, 8000); 
     }
 
-    // --- 数据交互 ---
+    // --- GitHub 云端数据同步核心 ---
     async function loadData() {
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { 
+                headers: { 'Authorization': `token ${G_TOKEN}` } 
+            });
             if (!res.ok) throw new Error("网络连接失败");
+            
             const issue = await res.json();
             const remoteData = JSON.parse(issue.body);
             
             if (remoteData && remoteData.topics) {
                 if (!remoteData.contents) remoteData.contents = remoteData.topics.map(() => "");
                 if (!remoteData.editTimes) remoteData.editTimes = remoteData.topics.map(() => "");
-                // 兼容老数据，如果没有分组信息，自动补全空分组
                 if (!remoteData.groups) remoteData.groups = remoteData.topics.map(() => "");
                 if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
                 
                 data = remoteData;
                 
-                if (isFirstLoad) { renderTable(); isFirstLoad = false; }
-                renderVotes(); updateOnlineCounter();
+                if (isFirstLoad) { 
+                    renderTable(); 
+                    isFirstLoad = false; 
+                }
+                
+                renderVotes(); 
+                updateOnlineCounter();
                 showStatus("✅ 实时同步中 (已连接)", "status-ok");
             }
         } catch (e) {
-            if (e.name === 'SyntaxError') saveDataToServer(); 
-            else showStatus("❌ 同步中断: " + e.message, "status-error");
+            if (e.name === 'SyntaxError') {
+                saveDataToServer(); 
+            } else {
+                showStatus("❌ 同步中断: " + e.message, "status-error");
+            }
         }
     }
 
     async function saveDataToServer() {
         if (currentUserRole !== 'admin') return; 
         showStatus("⏳ 正在保存到云端...", "status-ok");
+        
         try {
             await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
                 method: 'PATCH',
@@ -303,14 +759,67 @@
             });
             showStatus("✅ 保存成功！所有人可见", "status-ok");
             renderVotes(); 
-        } catch (e) { showStatus("❌ 保存失败，请检查网络", "status-error"); }
+        } catch (e) { 
+            showStatus("❌ 保存失败，请检查网络", "status-error"); 
+        }
     }
 
-    // --- 【核心进化】智能分组渲染引擎 ---
+    // --- 【新增亮点核心】相同组名自动颜色同步与实时反馈系统 ---
+    function syncGroupColors(triggerIndex) {
+        // 1. 获取触发改动的那个输入框的值
+        const triggerNameInput = document.getElementById(`group_${triggerIndex}`);
+        const triggerColorInput = document.getElementById(`color_${triggerIndex}`);
+        
+        if (!triggerNameInput || !triggerColorInput) return;
+
+        const targetName = triggerNameInput.value.trim();
+        const targetColor = triggerColorInput.value;
+
+        // 2. 遍历整个表格的所有输入框，强制同步相同组的颜色
+        data.topics.forEach((_, i) => {
+            const gNameInput = document.getElementById(`group_${i}`);
+            const gColorInput = document.getElementById(`color_${i}`);
+
+            if (gNameInput && gColorInput) {
+                // 如果其他列的组名和当前修改的组名完全一样（且不为空），就同步颜色！
+                if (targetName && gNameInput.value.trim() === targetName) {
+                    gColorInput.value = targetColor;
+                }
+            }
+        });
+
+        // 3. 将 DOM 里的临时数据覆盖到 data 对象中
+        syncDomToData();
+
+        // 4. 不刷新焦点，直接局部动态更新表格头部的颜色提示线条
+        data.topics.forEach((_, i) => {
+            const td1 = document.getElementById(`td_index_${i}`);
+            const numStrong = document.getElementById(`num_strong_${i}`);
+            const currentGroupName = data.groups[i];
+            const currentGroupColor = data.groupColors[i];
+
+            if (td1 && numStrong) {
+                if (currentGroupName) {
+                    td1.style.borderTop = `5px solid ${currentGroupColor}`;
+                    numStrong.style.color = currentGroupColor;
+                } else {
+                    td1.style.borderTop = `1px solid #e4e6eb`; // 没分组就重置颜色
+                    numStrong.style.color = `#0366d6`; 
+                }
+            }
+        });
+
+        // 5. 调用渲染投票区，由于不需要重新创建输入框，可以直接执行刷新以实现"即时变色"
+        renderVotes();
+    }
+
+
+    // --- 界面渲染引擎 ---
     function renderTable() {
         const tHead = document.getElementById('tHead');
         const tBody = document.getElementById('tBody');
-        tHead.innerHTML = ''; tBody.innerHTML = ''; 
+        tHead.innerHTML = ''; 
+        tBody.innerHTML = ''; 
         
         const tr1 = document.createElement('tr'); 
         const tr2 = document.createElement('tr'); 
@@ -320,48 +829,45 @@
         let th2 = document.createElement('th'); th2.innerText = '2. 主题名称与分类'; tr2.appendChild(th2);
         let th3 = document.createElement('th'); th3.innerText = '3. 内容详情'; tr3.appendChild(th3);
 
-        // 【智能映射算法】：计算出一个排序后的索引数组，原数据彻底不动！
-        // 这样你怎么删、怎么点，都不会出现错位的情况。
+        // 分组排序逻辑
         let indices = data.topics.map((_, i) => i);
         indices.sort((a, b) => {
             let gA = data.groups[a] || "";
             let gB = data.groups[b] || "";
-            if (gA && !gB) return -1; // 有分组的排前面
+            if (gA && !gB) return -1; 
             if (!gA && gB) return 1;
-            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'}); // 同分组排一起
-            return a - b; // 组内按原始编号从小到大排
+            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'}); 
+            return a - b; 
         });
 
-        // 按照排好序的索引渲染界面
         indices.forEach((i) => {
             let topic = data.topics[i];
             let groupName = data.groups[i] || "";
             let groupColor = data.groupColors[i] || "#0366d6";
             
-            // 编号行 (加入顶部彩色细线)
+            // 【行1】编号行 (添加了ID方便免刷新修改)
             let td1 = document.createElement('td'); 
-            // 如果有分组，顶部显示对应颜色的粗线
+            td1.id = `td_index_${i}`;
             if (groupName) td1.style.borderTop = `5px solid ${groupColor}`;
             
-            td1.innerHTML = `<strong style="font-size: 18px; color: ${groupName ? groupColor : '#0366d6'};"># ${i+1}</strong>`; 
+            td1.innerHTML = `<strong id="num_strong_${i}" style="font-size: 18px; color: ${groupName ? groupColor : '#0366d6'};"># ${i+1}</strong>`; 
             tr1.appendChild(td1);
             
-            // 标题与分组行
+            // 【行2】标题与分组设置行
             let td2 = document.createElement('td');
             if (currentUserRole === 'admin') {
                 let topicHtml = `<input type="text" id="topic_${i}" value="${topic}" placeholder="输入主题名称">`;
-                // 管理员特有：分组设置面板
+                // 给输入框绑定 oninput 事件，触发颜色联动引擎
                 topicHtml += `
                     <div class="group-inputs">
                         <span style="font-size: 12px; color: #666; font-weight: bold;">分组:</span>
-                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" placeholder="名称(不填则无分组)">
-                        <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" title="选择该分组的横条颜色">
+                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" oninput="syncGroupColors(${i})" placeholder="名称(不填无分组)">
+                        <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" oninput="syncGroupColors(${i})" title="选择该分组的颜色">
                     </div>
                 `;
                 td2.innerHTML = topicHtml;
             } else {
                 let html = '';
-                // 游客视角：如果有分组，显示漂亮的颜色徽章
                 if (groupName) {
                     html += `<div class="group-badge" style="background-color: ${groupColor};">${groupName}</div>`;
                 }
@@ -370,11 +876,13 @@
             }
             tr2.appendChild(td2);
 
-            // 内容与按钮行
+            // 【行3】内容编辑行
             let td3 = document.createElement('td');
             if (currentUserRole === 'admin') {
                 let contentDiv = document.createElement('div');
-                contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box'; contentDiv.contentEditable = true;
+                contentDiv.id = `content_${i}`; 
+                contentDiv.className = 'editor-box'; 
+                contentDiv.contentEditable = true;
                 contentDiv.innerHTML = data.contents[i]; 
                 td3.appendChild(contentDiv);
                 
@@ -387,7 +895,8 @@
                 td3.appendChild(toolsDiv);
             } else {
                 let contentDiv = document.createElement('div');
-                contentDiv.className = 'guest-view-box'; contentDiv.innerHTML = data.contents[i];
+                contentDiv.className = 'guest-view-box'; 
+                contentDiv.innerHTML = data.contents[i];
                 td3.appendChild(contentDiv);
                 
                 let toolsDiv = document.createElement('div');
@@ -447,12 +956,14 @@
         data.groups.splice(index, 1);
         data.groupColors.splice(index, 1);
         
-        renderTable(); saveDataToServer(); 
+        renderTable(); 
+        saveDataToServer(); 
     }
 
     function addColumn() {
         if (currentUserRole !== 'admin') return;
         syncDomToData(); 
+        
         data.topics.push(""); 
         data.contents.push("<br>"); 
         data.editTimes.push(""); 
@@ -460,7 +971,8 @@
         data.groups.push(""); 
         data.groupColors.push("#0366d6"); 
         
-        renderTable(); saveDataToServer(); 
+        renderTable(); 
+        saveDataToServer(); 
         
         setTimeout(() => {
             const container = document.getElementById('scrollContainer');
@@ -473,6 +985,7 @@
         document.getElementById('fullscreenEditor').focus();
     }
 
+    // --- 高清图片压缩直传工具 ---
     async function uploadImageToRepo(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -487,9 +1000,15 @@
             img.onload = async function() {
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 1000; 
-                let width = img.width; let height = img.height;
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height;
+                let width = img.width; 
+                let height = img.height;
+                
+                if (width > MAX_WIDTH) { 
+                    height *= MAX_WIDTH / width; 
+                    width = MAX_WIDTH; 
+                }
+                canvas.width = width; 
+                canvas.height = height;
                 
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
@@ -526,6 +1045,7 @@
         reader.readAsDataURL(file);
     }
 
+    // --- 全屏弹窗管理 ---
     function openFullscreen(index) {
         currentEditIndex = index;
         const isAdmin = currentUserRole === 'admin';
@@ -561,19 +1081,22 @@
         saveDataToServer();
     }
 
-    /* --- 投票系统 --- */
-    function getMyVotes() { return JSON.parse(localStorage.getItem('myMapVotes') || '{}'); }
+    // --- 实时计票与投票系统 ---
+    function getMyVotes() { 
+        return JSON.parse(localStorage.getItem('myMapVotes') || '{}'); 
+    }
 
     function renderVotes() {
         const voteArea = document.getElementById('voteArea');
         voteArea.innerHTML = '';
         const myVotes = getMyVotes();
 
-        // 投票区也按照智能映射的分组顺序来展示
         let indices = data.topics.map((_, i) => i);
         indices.sort((a, b) => {
-            let gA = data.groups[a] || ""; let gB = data.groups[b] || "";
-            if (gA && !gB) return -1; if (!gA && gB) return 1;
+            let gA = data.groups[a] || ""; 
+            let gB = data.groups[b] || "";
+            if (gA && !gB) return -1; 
+            if (!gA && gB) return 1;
             if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'});
             return a - b;
         });
@@ -587,12 +1110,14 @@
                 ? `<button class="btn-revoke" onclick="revokeVote(${i})">↩ 已支持 (点击撤回)</button>` 
                 : `<button class="btn-vote" onclick="castVote(${i})">👆 支持这个想法</button>`;
             
-            let badgeHtml = groupName ? `<div class="group-badge" style="background-color: ${groupColor}; font-size:11px; margin-bottom:10px;">${groupName}</div>` : '';
+            let badgeHtml = groupName 
+                ? `<div class="group-badge" style="background-color: ${groupColor}; font-size:11px; margin-bottom:10px;">${groupName}</div>` 
+                : '';
             
             voteArea.innerHTML += `<div class="vote-card" style="${groupName ? 'border-top: 4px solid '+groupColor+';' : ''}">
                 ${badgeHtml}
                 <h3 style="margin-top:0;">${topic || '未命名'}</h3>
-                <div class="count">${data.votes[i]}</div>
+                <div class="count" style="color:${groupName ? groupColor : '#d73a49'};">${data.votes[i]}</div>
                 ${btn}
             </div>`;
         });
@@ -602,9 +1127,13 @@
         let myVotes = getMyVotes();
         if (myVotes[index]) return; 
         
-        data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
+        data.votes[index]++; 
+        myVotes[index] = true; 
+        localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
+        
         fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            method: 'PATCH', 
+            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ body: JSON.stringify(data) })
         }).then(() => renderVotes());
     }
@@ -613,25 +1142,34 @@
         let myVotes = getMyVotes();
         if (!myVotes[index]) return; 
         
-        if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
+        if (data.votes[index] > 0) data.votes[index]--; 
+        delete myVotes[index]; 
+        localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); 
+        
         fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
-            method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+            method: 'PATCH', 
+            headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ body: JSON.stringify(data) })
         }).then(() => renderVotes());
     }
 
-    // 动画弹窗开闭逻辑
+    // --- 动画管理与全局工具函数 ---
     function openModal(modalId) { 
         const modal = document.getElementById(modalId);
         modal.style.display = 'flex'; 
         setTimeout(() => modal.style.opacity = '1', 10);
     }
+    
     function closeModal(modalId) { 
         const modal = document.getElementById(modalId);
         modal.style.opacity = '0'; 
-        setTimeout(() => modal.style.display = 'none', 300); // 等待动画结束再隐藏
+        setTimeout(() => modal.style.display = 'none', 300); 
     }
-    function showStatus(msg, className) { document.getElementById('status').innerText = msg; document.getElementById('status').className = `status-bar ${className}`; }
+    
+    function showStatus(msg, className) { 
+        document.getElementById('status').innerText = msg; 
+        document.getElementById('status').className = `status-bar ${className}`; 
+    }
     
     function updateOnlineCounter() {
         const totalVotes = data.votes.reduce((a, b) => a + b, 0);
