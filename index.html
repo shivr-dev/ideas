@@ -11,35 +11,39 @@
         :root { color-scheme: light !important; }
         
         @font-face { font-family: 'Minecraft Ten'; src: url("./OreUI/fonts/Minecraft-Ten.otf") format('opentype'); }
-        @font-face { font-family: 'Minecraft Seven v4'; src: url("./OreUI/fonts/Minecraft-Seven.otf") format('opentype'); }
+        /* 修复：使用你真实的字体文件名和 truetype 格式 */
+        @font-face { font-family: 'Minecraft Seven'; src: url("./OreUI/fonts/Minecraft-Seven-v4.ttf") format('truetype'); }
         @font-face { font-family: 'Minecraft Five Bold'; src: url("./OreUI/fonts/Minecraft-Five-Bold.otf") format('opentype'); }
 
         /* 强制全局去圆角，覆盖所有原生组件 */
         *, *::before, *::after { border-radius: 0 !important; }
 
         body { 
-            font-family: "Minecraft Seven v4", sans-serif; 
-            background-color: #48494A; 
+            font-family: "Minecraft Seven", sans-serif; 
+            background-color: #48494A; /* Ore UI 经典深灰背景 */
             margin: 0; padding: 20px; color: #FFFFFF; 
             overflow-x: hidden;
         }
 
+        /* 标题映射 */
         h1 { font-family: "Minecraft Ten", sans-serif; font-size: 32px; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin-top: 0; }
         h2, h3 { font-family: "Minecraft Five Bold", sans-serif; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin: 0 0 15px 0;}
 
         .container { 
             max-width: 1200px; margin: 0 auto; 
-            background-color: transparent; position: relative; 
+            background-color: transparent; 
+            position: relative; 
             animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
 
         /* ==========================================
-           2. 顶部栏与状态提示 (Toast)
+           2. Ore UI 顶部栏与状态提示
         ========================================== */
         .top-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 20;}
         .tool-btn { 
             background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; 
-            padding: 8px 15px; cursor: pointer; font-family: "Minecraft Seven", sans-serif;
+            padding: 8px 15px; cursor: pointer; 
+            font-family: "Minecraft Seven", sans-serif;
             box-shadow: inset 2px 2px rgba(255, 255, 255, 0.15), inset -2px -2px rgba(0, 0, 0, 0.3);
             display: flex; align-items: center; gap: 6px; transition: 0.1s;
         }
@@ -56,15 +60,16 @@
         .status-error { background-color: #313233; color: #F46D6D; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
 
         /* ==========================================
-           3. 按钮系统
+           3. Ore UI 按钮系统 (精准复刻像素阴影)
         ========================================== */
         .btn { 
-            font-family: "Minecraft Seven v4", sans-serif; cursor: pointer; 
+            font-family: "Minecraft Seven", sans-serif; cursor: pointer; 
             border: 2px solid #1E1E1F; font-weight: bold; 
             padding: 10px 20px 14px 20px; text-transform: uppercase; text-align: center; display: inline-block;
         }
         .btn:active { transform: translateY(4px); padding-bottom: 10px; margin-top: 4px; }
 
+        /* 灰色普通按钮 */
         .btn-add, .btn-close-modal, .btn-fullscreen, .icon-btn { 
             background-color: #D0D1D4; color: #000000;
             box-shadow: inset 0 -4px #58585A, inset 3px 3px rgba(255, 255, 255, 0.6), inset -3px -7px rgba(255, 255, 255, 0.4);
@@ -72,6 +77,7 @@
         .btn-add:hover, .btn-close-modal:hover, .btn-fullscreen:hover { background-color: #B1B2B5; }
         .btn-add:active, .btn-close-modal:active, .btn-fullscreen:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.8), inset -3px -3px rgba(255, 255, 255, 0.6); }
 
+        /* 绿色确认按钮 */
         .btn-save, .btn-vote { 
             background-color: #3C8527; color: #FFFFFF;
             box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
@@ -79,6 +85,7 @@
         .btn-save:hover, .btn-vote:hover { background-color: #2A641C; }
         .btn-save:active, .btn-vote:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.4), inset -3px -3px rgba(255, 255, 255, 0.3); }
 
+        /* 红色警告按钮 */
         .btn-delete-col, .btn-revoke { 
             background-color: #C33636; color: #FFFFFF; width: 100%; margin-top: 8px; font-size: 13px;
             box-shadow: inset 0 -4px #AD1D1D, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
@@ -87,7 +94,7 @@
         .btn-delete-col:active, .btn-revoke:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.5), inset -3px -3px rgba(255, 255, 255, 0.4); }
 
         .btn-fullscreen { margin-top: 10px; width: 100%; }
-        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;} /* 修复按钮大小 */
+        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;}
 
         /* ==========================================
            4. 输入框、富文本与原生组件修复
@@ -99,14 +106,13 @@
         }
         input:focus, .editor-box:focus { border-color: #FFFFFF; }
         
-        /* 针对你写的类补上样式 */
         .group-name-input { width: 120px; padding: 6px; box-shadow: inset 0 2px #242425; }
 
         .guest-view-box { background-color: #48494A; box-shadow: inset 2px 2px #313233; }
         .editor-box { min-height: 120px; overflow-y: auto; line-height: 1.6; }
         .editor-box img, .guest-view-box img { max-width: 100%; border: 2px solid #1E1E1F; margin: 5px 0; }
 
-        /* 原生文件上传按钮去圆角 */
+        /* 原生文件上传按钮去圆角并应用字体 */
         input[type="file"]::file-selector-button {
             border-radius: 0; background-color: #D0D1D4; border: 2px solid #1E1E1F;
             font-family: "Minecraft Seven", sans-serif; font-weight: bold; cursor: pointer;
@@ -131,13 +137,14 @@
         td { background-color: #48494A; }
 
         /* ==========================================
-           6. 弹窗与控制栏
+           6. 弹窗与控制栏 (Modals)
         ========================================== */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { 
-            background-color: #313233; color: #FFFFFF; border: 4px solid #1E1E1F; 
-            box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
-            width: 90%; max-width: 800px; padding: 30px; display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
+            background-color: #313233; color: #FFFFFF;
+            border: 4px solid #1E1E1F; box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
+            width: 90%; max-width: 800px; padding: 30px; 
+            display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
         }
 
         .filter-area, .group-inputs, .editor-toolbar, .image-upload-wrapper { 
@@ -145,17 +152,16 @@
             padding: 10px; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
         }
         
-        .filter-label { color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .filter-label { color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: "Minecraft Five Bold", sans-serif;}
 
         /* ==========================================
            7. 状态标签与正圆形拾色器
         ========================================== */
         .tag-select { 
             background-color: #D0D1D4; border: 2px solid #1E1E1F; color: #000; 
-            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; 
-            box-shadow: inset 2px 2px #FFF; appearance: none; -webkit-appearance: none;
+            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; box-shadow: inset 2px 2px #FFF;
+            appearance: none; -webkit-appearance: none;
         }
-        /* 添加一个简单的自定义下拉箭头 */
         .tag-select-wrapper { position: relative; display: inline-block; }
         .tag-select-wrapper::after { content: '▼'; font-size: 8px; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #000; }
 
@@ -187,7 +193,7 @@
         .group-color-input::-webkit-color-swatch { border: none; }
 
         /* ==========================================
-           8. 投票卡片
+           8. Ore UI 投票卡片
         ========================================== */
         .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
         .vote-card { 
@@ -206,6 +212,7 @@
 <body>
 
 <script>
+    // 扩展版全局音效引擎
     const oreSounds = {
         click: new Audio('./OreUI/sounds/sounds_click.ogg'),
         button: new Audio('./OreUI/sounds/sounds_button.ogg'),
@@ -215,18 +222,38 @@
     };
 
     function playSnd(type) {
-        try { if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); } } catch(e) {}
+        try { 
+            if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); }
+        } catch(e) {}
     }
 
+    // 修复：增加了对 select、file、checkbox 等系统控件的精准声音覆盖
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn') || e.target.closest('.format-btn')) { playSnd('button'); } 
-        else if (e.target.closest('input[type="checkbox"]') || e.target.closest('input[type="color"]') || e.target.closest('.icon-btn')) { playSnd('click'); }
+        if (e.target.closest('.btn') || e.target.closest('.format-btn')) { 
+            playSnd('button'); 
+        } else if (
+            e.target.closest('input[type="checkbox"]') || 
+            e.target.closest('input[type="color"]') || 
+            e.target.closest('input[type="file"]') || 
+            e.target.closest('select') || 
+            e.target.closest('.icon-btn') ||
+            e.target.closest('.filter-label') // 点击文字过滤器时也发声
+        ) { 
+            playSnd('click'); 
+        }
+    });
+
+    // 为下拉框选择变动提供额外保险
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT' || e.target.type === 'file') {
+            playSnd('click');
+        }
     });
 </script>
 
 <div class="modal-overlay" id="loginModal" style="display: flex;">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2>AUTHORIZATION</h2>
+        <h2> AUTHORIZATION</h2>
         <p style="color: #B1B2B5; font-size: 14px; margin-bottom: 25px;">Enter credentials to access Admin UI</p>
         <input type="text" id="loginUser" class="login-input" placeholder="Username (Admin: Infrato)">
         <input type="password" id="loginPass" class="login-input" placeholder="Password">
@@ -242,7 +269,7 @@
 
 <div class="modal-overlay" id="adminGuideModal">
     <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2>WELCOME ADMIN</h2>
+        <h2> WELCOME ADMIN</h2>
         <div style="background: #1E1E1F; border: 2px solid #5A5B5C; padding: 15px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
             > Manage Map Ideas and Votes.<br>
             > Group colors auto-sync.<br>
@@ -284,7 +311,7 @@
     
     <div class="admin-controls" id="adminButtons">
         <button class="btn btn-add" onclick="addColumn()">+ ADD IDEA</button>
-        <button class="btn btn-save" onclick="manualSave()">SAVE ALL</button>
+        <button class="btn btn-save" onclick="manualSave()"> SAVE ALL</button>
     </div>
 
     <hr style="margin: 40px 0; border: 0; border-top: 4px solid #313233;">
@@ -295,7 +322,7 @@
 
 <div class="modal-overlay" id="editModal">
     <div class="modal-content">
-        <h2>DETAILS EDITOR</h2>
+        <h2> DETAILS EDITOR</h2>
         <div class="image-upload-wrapper" id="imageUploadArea">
             <div>
                 <label style="font-weight: bold; font-size: 15px; color: #6CC349;">UPLOAD IMAGE:</label>
@@ -376,16 +403,21 @@
                 if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
                 if (!remoteData.tags) remoteData.tags = remoteData.topics.map(() => "想法"); 
                 
+                // 判断：如果是后台静默刷新，且数据有变化（别人提交了新内容），我们才播放Toast提示音
+                const isDataChanged = JSON.stringify(data) !== JSON.stringify(remoteData);
                 data = remoteData;
+                
                 if (isFirstLoad) { 
                     data.groups.forEach(g => activeFilters.add(g || "UNGROUPED"));
                     renderFilters(); renderTable(); isFirstLoad = false; 
-                    // 仅在首次加载时播放声音
                     showStatus("SYNCED WITH SERVER", "status-ok", true);
                 } else { 
                     renderFilters(); 
-                    // 自动刷新时静音
-                    showStatus("SYNCED WITH SERVER", "status-ok", false);
+                    if (isDataChanged) {
+                        showStatus("NEW UPDATE RECEIVED", "status-ok", true); // 有人更新时发出声音
+                    } else {
+                        showStatus("SYNCED WITH SERVER", "status-ok", false); // 无变化时安静刷新
+                    }
                 }
                 renderVotes(); updateOnlineCounter();
             }
@@ -403,8 +435,7 @@
                 method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ body: JSON.stringify(data) })
             });
-            // 手动保存成功时播放声音
-            showStatus("SAVED SUCCESSFULLY", "status-ok", true);
+            showStatus("SAVED SUCCESSFULLY", "status-ok", true); // 手动保存成功时响一声
             renderFilters(); renderVotes(); 
         } catch (e) { showStatus("SAVE ERROR", "status-error", true); }
     }
@@ -525,7 +556,7 @@
                         <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" oninput="handleGroupInput(${i})" placeholder="Group Name">
                         <button class="icon-btn" onclick="toggleColorMenu(${i})" title="Color">PALETTE</button>
                         <div class="tag-select-wrapper">
-                            <select id="tag_${i}" class="tag-select" onchange="syncDomToData(); renderTable(); renderVotes(); playSnd('click')">
+                            <select id="tag_${i}" class="tag-select" onchange="syncDomToData(); renderTable(); renderVotes();">
                                 <option value="想法" ${tag==='想法'?'selected':''}>IDEA</option>
                                 <option value="更新" ${tag==='更新'?'selected':''}>UPDATE</option>
                                 <option value="紧急" ${tag==='紧急'?'selected':''}>URGENT</option>
@@ -658,7 +689,7 @@
     function openModal(id) { const m = document.getElementById(id); m.style.display = 'flex'; setTimeout(() => m.style.opacity = '1', 10); playSnd('pop'); }
     function closeModal(id) { const m = document.getElementById(id); m.style.opacity = '0'; setTimeout(() => m.style.display = 'none', 300); }
     
-    // 增加了一个 mute 参数，用来控制是否播放音效
+    // 带有控制参数的 Toast 提示音引擎
     function showStatus(msg, cls, playSound = true) { 
         document.getElementById('status').innerText = msg; 
         document.getElementById('status').className = `status-bar ${cls}`; 
