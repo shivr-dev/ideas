@@ -11,200 +11,128 @@
         :root { color-scheme: light !important; }
         
         @font-face { font-family: 'Minecraft Ten'; src: url("./OreUI/fonts/Minecraft-Ten.otf") format('opentype'); }
-        /* 修复：使用你真实的字体文件名和 truetype 格式 */
         @font-face { font-family: 'Minecraft Seven'; src: url("./OreUI/fonts/Minecraft-Seven-v4.ttf") format('truetype'); }
         @font-face { font-family: 'Minecraft Five Bold'; src: url("./OreUI/fonts/Minecraft-Five-Bold.otf") format('opentype'); }
 
-        /* 强制全局去圆角，覆盖所有原生组件 */
-        *, *::before, *::after { border-radius: 0 !important; }
+        /* 强制全局去圆角 */
+        *, *::before, *::after { border-radius: 0 !important; box-sizing: border-box;}
 
         body { 
             font-family: "Minecraft Seven", sans-serif; 
-            background-color: #48494A; /* Ore UI 经典深灰背景 */
-            margin: 0; padding: 20px; color: #FFFFFF; 
+            background-color: #48494A; margin: 0; padding: 20px; color: #FFFFFF; 
             overflow-x: hidden;
         }
 
-        /* 标题映射 */
         h1 { font-family: "Minecraft Ten", sans-serif; font-size: 32px; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin-top: 0; }
         h2, h3 { font-family: "Minecraft Five Bold", sans-serif; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin: 0 0 15px 0;}
 
-        .container { 
-            max-width: 1200px; margin: 0 auto; 
-            background-color: transparent; 
-            position: relative; 
-            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
+        .container { max-width: 1200px; margin: 0 auto; background-color: transparent; position: relative; animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
         /* ==========================================
-           2. Ore UI 顶部栏与状态提示
+           2. 顶部栏与状态提示
         ========================================== */
         .top-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 20;}
         .tool-btn { 
-            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; 
-            padding: 8px 15px; cursor: pointer; 
-            font-family: "Minecraft Seven", sans-serif;
-            box-shadow: inset 2px 2px rgba(255, 255, 255, 0.15), inset -2px -2px rgba(0, 0, 0, 0.3);
+            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; padding: 8px 15px; cursor: pointer; 
+            font-family: "Minecraft Seven", sans-serif; box-shadow: inset 2px 2px rgba(255, 255, 255, 0.15), inset -2px -2px rgba(0, 0, 0, 0.3);
             display: flex; align-items: center; gap: 6px; transition: 0.1s;
         }
         .tool-btn:hover { background-color: #48494A; }
         .tool-btn:active { box-shadow: inset 2px 2px rgba(0,0,0,0.4); transform: translateY(2px); }
-
         .online-indicator { width: 8px; height: 8px; background: #6CC349; border: 2px solid #1E1E1F; animation: pulse 2s infinite; }
         
-        .status-bar { 
-            font-family: "Minecraft Five Bold", sans-serif; font-size: 14px; padding: 12px; margin-bottom: 20px; 
-            border: 2px solid #1E1E1F; text-align: center; text-transform: uppercase;
-        }
+        .status-bar { font-family: "Minecraft Five Bold", sans-serif; font-size: 14px; padding: 12px; margin-bottom: 20px; border: 2px solid #1E1E1F; text-align: center; text-transform: uppercase; }
         .status-ok { background-color: #313233; color: #6CC349; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
         .status-error { background-color: #313233; color: #F46D6D; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
 
         /* ==========================================
-           3. Ore UI 按钮系统 (精准复刻像素阴影)
+           3. 按钮系统
         ========================================== */
-        .btn { 
-            font-family: "Minecraft Seven", sans-serif; cursor: pointer; 
-            border: 2px solid #1E1E1F; font-weight: bold; 
-            padding: 10px 20px 14px 20px; text-transform: uppercase; text-align: center; display: inline-block;
-        }
+        .btn { font-family: "Minecraft Seven", sans-serif; cursor: pointer; border: 2px solid #1E1E1F; font-weight: bold; padding: 10px 20px 14px 20px; text-transform: uppercase; text-align: center; display: inline-block; }
         .btn:active { transform: translateY(4px); padding-bottom: 10px; margin-top: 4px; }
 
-        /* 灰色普通按钮 */
-        .btn-add, .btn-close-modal, .btn-fullscreen, .icon-btn { 
-            background-color: #D0D1D4; color: #000000;
-            box-shadow: inset 0 -4px #58585A, inset 3px 3px rgba(255, 255, 255, 0.6), inset -3px -7px rgba(255, 255, 255, 0.4);
-        }
-        .btn-add:hover, .btn-close-modal:hover, .btn-fullscreen:hover { background-color: #B1B2B5; }
-        .btn-add:active, .btn-close-modal:active, .btn-fullscreen:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.8), inset -3px -3px rgba(255, 255, 255, 0.6); }
+        .btn-add, .btn-close-modal, .btn-fullscreen, .icon-btn { background-color: #D0D1D4; color: #000000; box-shadow: inset 0 -4px #58585A, inset 3px 3px rgba(255, 255, 255, 0.6), inset -3px -7px rgba(255, 255, 255, 0.4); }
+        .btn-add:hover, .btn-close-modal:hover, .btn-fullscreen:hover, .icon-btn:hover { background-color: #B1B2B5; }
+        .btn-add:active, .btn-close-modal:active, .btn-fullscreen:active, .icon-btn:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.8), inset -3px -3px rgba(255, 255, 255, 0.6); }
 
-        /* 绿色确认按钮 */
-        .btn-save, .btn-vote { 
-            background-color: #3C8527; color: #FFFFFF;
-            box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
-        }
+        .btn-save, .btn-vote { background-color: #3C8527; color: #FFFFFF; box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1); }
         .btn-save:hover, .btn-vote:hover { background-color: #2A641C; }
         .btn-save:active, .btn-vote:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.4), inset -3px -3px rgba(255, 255, 255, 0.3); }
 
-        /* 红色警告按钮 */
-        .btn-delete-col, .btn-revoke { 
-            background-color: #C33636; color: #FFFFFF; width: 100%; margin-top: 8px; font-size: 13px;
-            box-shadow: inset 0 -4px #AD1D1D, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
-        }
+        .btn-delete-col, .btn-revoke { background-color: #C33636; color: #FFFFFF; width: 100%; margin-top: 8px; font-size: 13px; box-shadow: inset 0 -4px #AD1D1D, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1); }
         .btn-delete-col:hover, .btn-revoke:hover { background-color: #C02D2D; }
         .btn-delete-col:active, .btn-revoke:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.5), inset -3px -3px rgba(255, 255, 255, 0.4); }
 
         .btn-fullscreen { margin-top: 10px; width: 100%; }
-        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;}
+        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;} 
 
         /* ==========================================
-           4. 输入框、富文本与原生组件修复
+           4. 输入框与富文本
         ========================================== */
         input[type="text"], input[type="password"], .guest-view-box, .editor-box, .group-name-input { 
-            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F;
-            box-shadow: inset 0 4px #242425; padding: 10px; font-family: "Minecraft Seven", sans-serif; 
-            box-sizing: border-box; width: 100%; outline: none; caret-color: #6CC349;
+            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; box-shadow: inset 0 4px #242425; padding: 10px; font-family: "Minecraft Seven", sans-serif; width: 100%; outline: none; caret-color: #6CC349;
         }
         input:focus, .editor-box:focus { border-color: #FFFFFF; }
-        
         .group-name-input { width: 120px; padding: 6px; box-shadow: inset 0 2px #242425; }
-
         .guest-view-box { background-color: #48494A; box-shadow: inset 2px 2px #313233; }
         .editor-box { min-height: 120px; overflow-y: auto; line-height: 1.6; }
-        .editor-box img, .guest-view-box img { max-width: 100%; border: 2px solid #1E1E1F; margin: 5px 0; }
 
-        /* 原生文件上传按钮去圆角并应用字体 */
-        input[type="file"]::file-selector-button {
-            border-radius: 0; background-color: #D0D1D4; border: 2px solid #1E1E1F;
-            font-family: "Minecraft Seven", sans-serif; font-weight: bold; cursor: pointer;
-            box-shadow: inset 2px 2px #FFF; padding: 4px 8px; margin-right: 10px;
+        /* 🚀 新增：强制内容超过8行显示省略号 */
+        .line-clamp-8 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
         }
 
-        /* 原生复选框去圆角 */
+        input[type="file"]::file-selector-button { border-radius: 0; background-color: #D0D1D4; border: 2px solid #1E1E1F; font-family: "Minecraft Seven", sans-serif; font-weight: bold; cursor: pointer; box-shadow: inset 2px 2px #FFF; padding: 4px 8px; margin-right: 10px; }
         input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #1E1E1F; background-color: #313233; cursor: pointer; position: relative; }
         input[type="checkbox"]:checked { background-color: #6CC349; }
         input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid #1E1E1F; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 
         /* ==========================================
-           5. 表格与视图容器
+           5. 表格与弹窗
         ========================================== */
         .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
         .table-wrapper::-webkit-scrollbar { height: 16px; background: #313233; border: 2px solid #1E1E1F; }
         .table-wrapper::-webkit-scrollbar-thumb { background: #D0D1D4; border: 2px solid #1E1E1F; box-shadow: inset 2px 2px #FFF; cursor: pointer; }
-
         table { border-collapse: collapse; table-layout: fixed; width: max-content; }
         th, td { border: 2px solid #1E1E1F; padding: 15px; text-align: center; vertical-align: top; width: 260px; word-wrap: break-word; }
         th { background-color: #313233; color: #FFFFFF; font-family: "Minecraft Five Bold", sans-serif; text-transform: uppercase; }
         td { background-color: #48494A; }
 
-        /* ==========================================
-           6. 弹窗与控制栏 (Modals)
-        ========================================== */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { 
-            background-color: #313233; color: #FFFFFF;
-            border: 4px solid #1E1E1F; box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
-            width: 90%; max-width: 800px; padding: 30px; 
-            display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
-        }
-
-        .filter-area, .group-inputs, .editor-toolbar, .image-upload-wrapper { 
-            background-color: #313233; border: 2px solid #1E1E1F; border-top: 2px solid #5A5B5C; border-left: 2px solid #5A5B5C;
-            padding: 10px; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-        }
-        
+        .modal-content { background-color: #313233; color: #FFFFFF; border: 4px solid #1E1E1F; box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3); width: 90%; max-width: 800px; padding: 30px; display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto; }
+        .filter-area, .group-inputs, .editor-toolbar, .image-upload-wrapper { background-color: #313233; border: 2px solid #1E1E1F; border-top: 2px solid #5A5B5C; border-left: 2px solid #5A5B5C; padding: 10px; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .filter-label { color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: "Minecraft Five Bold", sans-serif;}
 
         /* ==========================================
-           7. 状态标签与正圆形拾色器
+           6. 状态标签与正圆形拾色器
         ========================================== */
-        .tag-select { 
-            background-color: #D0D1D4; border: 2px solid #1E1E1F; color: #000; 
-            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; box-shadow: inset 2px 2px #FFF;
-            appearance: none; -webkit-appearance: none;
-        }
+        .tag-select { background-color: #D0D1D4; border: 2px solid #1E1E1F; color: #000; font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; box-shadow: inset 2px 2px #FFF; appearance: none; -webkit-appearance: none; }
         .tag-select-wrapper { position: relative; display: inline-block; }
         .tag-select-wrapper::after { content: '▼'; font-size: 8px; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #000; }
-
-        .tag-badge { 
-            font-family: "Minecraft Five Bold", sans-serif; font-size: 11px; padding: 4px 8px; color: #FFF; 
-            border: 2px solid #1E1E1F; display: inline-block; vertical-align: middle; box-shadow: inset 2px 2px rgba(255,255,255,0.3); text-transform: uppercase;
-        }
-        .tag-想法 { background-color: #6CC349; } 
-        .tag-更新 { background-color: #FFE866; color: #000; } 
-        .tag-紧急 { background-color: #F46D6D; animation: pulse-live 1.5s infinite; } 
+        .tag-badge { font-family: "Minecraft Five Bold", sans-serif; font-size: 11px; padding: 4px 8px; color: #FFF; border: 2px solid #1E1E1F; display: inline-block; vertical-align: middle; box-shadow: inset 2px 2px rgba(255,255,255,0.3); text-transform: uppercase; }
+        .tag-想法 { background-color: #6CC349; } .tag-更新 { background-color: #FFE866; color: #000; } .tag-紧急 { background-color: #F46D6D; animation: pulse-live 1.5s infinite; } 
 
         @keyframes pulse-live { 0% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(244, 109, 109, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0); } }
 
-        .group-badge { 
-            background-color: #313233; color: #FFF; padding: 4px 10px; font-weight: bold; border: 2px solid #1E1E1F; 
-            box-shadow: inset 2px 2px rgba(255,255,255,0.2); font-size: 12px; margin-bottom: 8px; display: inline-block;
-        }
-
-        /* 唯一的特例：正圆形拾色器 */
-        .group-color-input, .group-color-input::-webkit-color-swatch, .group-color-input::-webkit-color-swatch-wrapper { 
-            border-radius: 50% !important; 
-        }
-        .group-color-input { 
-            -webkit-appearance: none; appearance: none; width: 28px !important; height: 28px !important; 
-            padding: 0; border: 2px solid #1E1E1F; cursor: pointer; 
-            box-shadow: inset 2px 2px rgba(255,255,255,0.4); background-color: transparent; overflow: hidden; 
-        }
+        .group-badge { background-color: #313233; color: #FFF; padding: 4px 10px; font-weight: bold; border: 2px solid #1E1E1F; box-shadow: inset 2px 2px rgba(255,255,255,0.2); font-size: 12px; margin-bottom: 8px; display: inline-block; }
+        .group-color-input, .group-color-input::-webkit-color-swatch, .group-color-input::-webkit-color-swatch-wrapper { border-radius: 50% !important; }
+        .group-color-input { -webkit-appearance: none; appearance: none; width: 28px !important; height: 28px !important; padding: 0; border: 2px solid #1E1E1F; cursor: pointer; box-shadow: inset 2px 2px rgba(255,255,255,0.4); background-color: transparent; overflow: hidden; }
         .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
         .group-color-input::-webkit-color-swatch { border: none; }
 
         /* ==========================================
-           8. Ore UI 投票卡片
+           7. 投票卡片
         ========================================== */
         .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
-        .vote-card { 
-            background-color: #313233; border: 2px solid #1E1E1F; padding: 20px; text-align: center; 
-            box-shadow: inset -2px -2px #1E1E1F, inset 2px 2px #5A5B5C;
-        }
+        .vote-card { background-color: #313233; border: 2px solid #1E1E1F; padding: 20px; text-align: center; box-shadow: inset -2px -2px #1E1E1F, inset 2px 2px #5A5B5C; }
         .count { font-family: "Minecraft Ten", sans-serif; font-size: 42px; margin: 15px 0; text-shadow: 2px 2px 0 #1E1E1F;}
-        
         .format-btn { background: #D0D1D4; border: 2px solid #1E1E1F; font-weight: bold; cursor: pointer; box-shadow: inset 2px 2px #FFF; }
         .format-btn:active { box-shadow: inset 2px 2px #888; }
-        
         .login-input { margin-bottom: 15px; }
         .modal-actions { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
     </style>
@@ -212,7 +140,55 @@
 <body>
 
 <script>
-    // 扩展版全局音效引擎
+    // 🚀 新增：Ore UI 音频播放器 Web Component (完美兼容文本编辑器保存)
+    class OreAudioPlayer extends HTMLElement {
+        connectedCallback() {
+            const src = this.getAttribute('src');
+            const name = this.getAttribute('name') || 'AUDIO FILE';
+            this.innerHTML = `
+                <div contenteditable="false" style="background:#313233; border:2px solid #1E1E1F; padding:10px; margin:10px 0; font-family:'Minecraft Seven', sans-serif;">
+                    <div style="color:#FFE866; font-family:'Minecraft Five Bold'; margin-bottom:10px; font-size:12px;">🎵 ${name}</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button class="btn icon-btn play-btn" style="padding:4px 10px; margin:0;" onclick="this.getRootNode().host.togglePlay(this)">PLAY</button>
+                        <div class="progress-bg" style="flex:1; height:16px; background:#48494A; border:2px solid #1E1E1F; cursor:pointer; position:relative;" onclick="this.getRootNode().host.seek(event)">
+                            <div class="progress-fill" style="height:100%; width:0%; background:#3C8527; box-shadow:inset 2px 2px rgba(255,255,255,0.2); pointer-events:none;"></div>
+                        </div>
+                        <span class="time-display" style="font-size:12px; min-width:35px; text-align:right; color:#FFF;">0:00</span>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <a href="${src}" target="_blank" download="${name}" class="btn icon-btn" style="text-decoration:none; display:inline-block;">DOWNLOAD AUDIO</a>
+                    </div>
+                    <audio src="${src}" style="display:none;" ontimeupdate="this.getRootNode().host.updateProgress(this)" onended="this.getRootNode().host.resetPlay(this)"></audio>
+                </div>
+            `;
+        }
+        togglePlay(btn) {
+            const audio = this.querySelector('audio');
+            if(audio.paused) { audio.play(); btn.innerText = 'PAUSE'; playSnd('click'); }
+            else { audio.pause(); btn.innerText = 'PLAY'; playSnd('click'); }
+        }
+        updateProgress(audio) {
+            const fill = this.querySelector('.progress-fill');
+            const timeDisplay = this.querySelector('.time-display');
+            if(audio.duration) {
+                fill.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+                const mins = Math.floor(audio.currentTime / 60);
+                const secs = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+                timeDisplay.innerText = `${mins}:${secs}`;
+            }
+        }
+        seek(event) {
+            const bg = this.querySelector('.progress-bg');
+            const audio = this.querySelector('audio');
+            if(!audio.duration) return;
+            const percent = event.offsetX / bg.offsetWidth;
+            audio.currentTime = percent * audio.duration;
+        }
+        resetPlay(audio) { this.querySelector('.play-btn').innerText = 'PLAY'; }
+    }
+    customElements.define('ore-audio', OreAudioPlayer);
+
+    // 全局音效引擎
     const oreSounds = {
         click: new Audio('./OreUI/sounds/sounds_click.ogg'),
         button: new Audio('./OreUI/sounds/sounds_button.ogg'),
@@ -222,12 +198,9 @@
     };
 
     function playSnd(type) {
-        try { 
-            if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); }
-        } catch(e) {}
+        try { if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); } } catch(e) {}
     }
 
-    // 修复：增加了对 select、file、checkbox 等系统控件的精准声音覆盖
     document.addEventListener('click', function(e) {
         if (e.target.closest('.btn') || e.target.closest('.format-btn')) { 
             playSnd('button'); 
@@ -237,23 +210,20 @@
             e.target.closest('input[type="file"]') || 
             e.target.closest('select') || 
             e.target.closest('.icon-btn') ||
-            e.target.closest('.filter-label') // 点击文字过滤器时也发声
+            e.target.closest('.filter-label') 
         ) { 
             playSnd('click'); 
         }
     });
 
-    // 为下拉框选择变动提供额外保险
     document.addEventListener('change', function(e) {
-        if (e.target.tagName === 'SELECT' || e.target.type === 'file') {
-            playSnd('click');
-        }
+        if (e.target.tagName === 'SELECT' || e.target.type === 'file') playSnd('click');
     });
 </script>
 
 <div class="modal-overlay" id="loginModal" style="display: flex;">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2> AUTHORIZATION</h2>
+        <h2>AUTHORIZATION</h2>
         <p style="color: #B1B2B5; font-size: 14px; margin-bottom: 25px;">Enter credentials to access Admin UI</p>
         <input type="text" id="loginUser" class="login-input" placeholder="Username (Admin: Infrato)">
         <input type="password" id="loginPass" class="login-input" placeholder="Password">
@@ -269,11 +239,11 @@
 
 <div class="modal-overlay" id="adminGuideModal">
     <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2> WELCOME ADMIN</h2>
+        <h2>WELCOME ADMIN</h2>
         <div style="background: #1E1E1F; border: 2px solid #5A5B5C; padding: 15px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
             > Manage Map Ideas and Votes.<br>
             > Group colors auto-sync.<br>
-            > Upload High-Res images directly.<br>
+            > Upload Any Files/Audios/Images.<br>
             > Guests cannot edit contents.
         </div>
         <div class="modal-actions" style="justify-content: center;">
@@ -322,13 +292,13 @@
 
 <div class="modal-overlay" id="editModal">
     <div class="modal-content">
-        <h2> DETAILS EDITOR</h2>
+        <h2>DETAILS EDITOR</h2>
         <div class="image-upload-wrapper" id="imageUploadArea">
             <div>
-                <label style="font-weight: bold; font-size: 15px; color: #6CC349;">UPLOAD IMAGE:</label>
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: #B1B2B5;">Upload directly to GitHub /images repo.</p>
+                <label style="font-weight: bold; font-size: 15px; color: #6CC349;">UPLOAD ANY FILE:</label>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #B1B2B5;">Images, Audios, or General files (Max 20MB).</p>
             </div>
-            <input type="file" id="imageInput" accept="image/*" onchange="uploadImageToRepo(event)" style="width: 200px;">
+            <input type="file" id="imageInput" accept="*/*" onchange="uploadFileToRepo(event)" style="width: 200px;">
         </div>
         <div class="editor-toolbar" id="textToolbar" style="display: none;">
             <button class="format-btn" style="font-weight: bold;" onclick="formatText('bold')" title="加粗">B</button>
@@ -403,7 +373,6 @@
                 if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
                 if (!remoteData.tags) remoteData.tags = remoteData.topics.map(() => "想法"); 
                 
-                // 判断：如果是后台静默刷新，且数据有变化（别人提交了新内容），我们才播放Toast提示音
                 const isDataChanged = JSON.stringify(data) !== JSON.stringify(remoteData);
                 data = remoteData;
                 
@@ -413,11 +382,8 @@
                     showStatus("SYNCED WITH SERVER", "status-ok", true);
                 } else { 
                     renderFilters(); 
-                    if (isDataChanged) {
-                        showStatus("NEW UPDATE RECEIVED", "status-ok", true); // 有人更新时发出声音
-                    } else {
-                        showStatus("SYNCED WITH SERVER", "status-ok", false); // 无变化时安静刷新
-                    }
+                    if (isDataChanged) { showStatus("NEW UPDATE RECEIVED", "status-ok", true); } 
+                    else { showStatus("SYNCED WITH SERVER", "status-ok", false); }
                 }
                 renderVotes(); updateOnlineCounter();
             }
@@ -435,7 +401,7 @@
                 method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ body: JSON.stringify(data) })
             });
-            showStatus("SAVED SUCCESSFULLY", "status-ok", true); // 手动保存成功时响一声
+            showStatus("SAVED SUCCESSFULLY", "status-ok", true);
             renderFilters(); renderVotes(); 
         } catch (e) { showStatus("SAVE ERROR", "status-error", true); }
     }
@@ -577,12 +543,14 @@
 
             let td3 = document.createElement('td');
             if (currentUserRole === 'admin') {
-                let contentDiv = document.createElement('div'); contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box'; contentDiv.contentEditable = true; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
+                // 🚀 应用 line-clamp-8 限制表格显示高度
+                let contentDiv = document.createElement('div'); contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box line-clamp-8'; contentDiv.contentEditable = true; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
                 let toolsDiv = document.createElement('div');
                 toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">ZOOM EDITOR</button><button class="btn btn-delete-col" onclick="deleteColumn(${i})">DELETE THIS</button>`;
                 td3.appendChild(toolsDiv);
             } else {
-                let contentDiv = document.createElement('div'); contentDiv.className = 'guest-view-box'; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
+                // 🚀 应用 line-clamp-8 限制表格显示高度
+                let contentDiv = document.createElement('div'); contentDiv.className = 'guest-view-box line-clamp-8'; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
                 let toolsDiv = document.createElement('div'); toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">DETAILS</button>`; td3.appendChild(toolsDiv);
             }
             tr3.appendChild(td3);
@@ -624,29 +592,82 @@
 
     function formatText(cmd) { document.execCommand(cmd, false, null); document.getElementById('fullscreenEditor').focus(); }
 
-    async function uploadImageToRepo(event) {
-        const file = event.target.files[0]; if (!file) return;
-        showStatus("UPLOADING IMAGE...", "status-ok", false); document.getElementById('btnSaveFullscreen').disabled = true;
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const img = new Image();
-            img.onload = async function() {
-                const canvas = document.createElement('canvas'); const MAX_WIDTH = 1000; let w = img.width, h = img.height;
-                if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
-                canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                const base64Data = canvas.toDataURL('image/jpeg', 0.85).split(',')[1]; const filename = `vote_img_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/images/${filename}`, {
-                        method: 'PUT', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `Upload img`, content: base64Data })
-                    });
-                    if (!res.ok) throw new Error(`API Error`);
-                    const uploadResult = await res.json();
-                    document.getElementById('fullscreenEditor').focus(); document.execCommand('insertHTML', false, `<br><img src="${uploadResult.content.download_url}"><br>`);
-                    showStatus("IMAGE UPLOADED", "status-ok", true);
-                } catch (err) { alert("Upload Failed"); showStatus("UPLOAD ERROR", "status-error", true); } 
-                finally { event.target.value = ''; document.getElementById('btnSaveFullscreen').disabled = false; }
-            }; img.src = e.target.result;
-        }; reader.readAsDataURL(file);
+    // 🚀 新增：全能型文件读取与压缩上传系统
+    async function uploadFileToRepo(event) {
+        const file = event.target.files[0]; 
+        if (!file) return;
+
+        // 文件大小保护限制 (20MB) 防止浏览器崩溃
+        if (file.size > 20 * 1024 * 1024) {
+            alert("File is too large! Maximum allowed is 20MB.");
+            return;
+        }
+
+        showStatus("UPLOADING FILE...", "status-ok", false); 
+        document.getElementById('btnSaveFullscreen').disabled = true;
+
+        try {
+            let base64Data;
+            
+            // 如果是图片，执行压缩裁剪
+            if (file.type.startsWith('image/')) {
+                base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas'); const MAX_WIDTH = 1000; let w = img.width, h = img.height;
+                            if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
+                            canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                // 如果是音频或其他文件，直接读取转 base64
+                base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const filename = `upload_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/uploads/${filename}`, {
+                method: 'PUT', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ message: `Upload ${file.name}`, content: base64Data })
+            });
+
+            if (!res.ok) throw new Error(`API Error`);
+            const uploadResult = await res.json();
+            const fileUrl = uploadResult.content.download_url;
+
+            document.getElementById('fullscreenEditor').focus();
+
+            let insertHtml = '';
+            
+            // 🚀 根据不同类型插入不同 Ore UI 风格组件 (内置下载按钮)
+            if (file.type.startsWith('image/')) {
+                insertHtml = `<br><div contenteditable="false" style="display:inline-block; border:2px solid #1E1E1F; background:#313233; padding:10px; margin:5px 0;"><img src="${fileUrl}" style="max-width:100%; border:2px solid #1E1E1F;"><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" style="text-decoration:none; margin-top:10px; display:inline-block;">DOWNLOAD IMAGE</a></div><br>`;
+            } else if (file.type.startsWith('audio/')) {
+                insertHtml = `<br><ore-audio src="${fileUrl}" name="${file.name}" contenteditable="false"></ore-audio><br>`;
+            } else {
+                insertHtml = `<br><div contenteditable="false" style="padding:10px; border:2px solid #1E1E1F; background:#313233; margin:5px 0;"><span style="color:#FFE866; font-family:'Minecraft Five Bold'; font-size:12px;">📄 FILE: ${file.name}</span><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" style="margin-top:10px; text-decoration:none; display:inline-block;">DOWNLOAD FILE</a></div><br>`;
+            }
+
+            document.execCommand('insertHTML', false, insertHtml);
+            showStatus("FILE UPLOADED", "status-ok", true);
+        } catch (err) { 
+            console.error(err);
+            alert("Upload Failed"); 
+            showStatus("UPLOAD ERROR", "status-error", true); 
+        } finally { 
+            event.target.value = ''; 
+            document.getElementById('btnSaveFullscreen').disabled = false; 
+        }
     }
 
     function openFullscreen(index) {
@@ -689,7 +710,6 @@
     function openModal(id) { const m = document.getElementById(id); m.style.display = 'flex'; setTimeout(() => m.style.opacity = '1', 10); playSnd('pop'); }
     function closeModal(id) { const m = document.getElementById(id); m.style.opacity = '0'; setTimeout(() => m.style.display = 'none', 300); }
     
-    // 带有控制参数的 Toast 提示音引擎
     function showStatus(msg, cls, playSound = true) { 
         document.getElementById('status').innerText = msg; 
         document.getElementById('status').className = `status-bar ${cls}`; 
