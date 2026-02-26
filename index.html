@@ -412,13 +412,22 @@
 </div>
 
 <script>
+        // ============ 核心配置：双仓库分家 ============
     const p1 = 'ghp_'; 
     const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; 
     const G_TOKEN = p1 + p2; 
 
     const REPO_OWNER = 'shivr-dev';
-    const REPO_NAME = 'ideas';
+    
+    // 1. 公开仓库：用来存放大家都能看的投票内容
+    const VOTE_REPO = 'ideas'; 
+    
+    // 2. 私有仓库：用来存放账号、密码和审核单（必须是你刚新建的那个私有库）
+    const AUTH_REPO = 'ideas-data'; 
+
+    // 如果你之前的投票统计是在这个 ID 下，保留它（属于公开库）
     const ISSUE_ID = 1; 
+
 
     let data = { topics: [], contents: [], editTimes: [], votes: [], groups: [], groupColors: [], tags: [] };
     let currentUserRole = null; 
@@ -855,6 +864,14 @@
     }
     
     function updateOnlineCounter() { document.getElementById('onlineCount').innerText = `Online: ${Math.max(1, Math.floor(data.votes.reduce((a, b) => a + b, 0) / 2)) + ((Math.floor(Date.now() / 15000) + data.votes.reduce((a, b) => a + b, 0)) % 4)}`; }
+    async function loadIdeas() {
+    // 这里的 URL 使用 VOTE_REPO
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues?labels=idea`, {
+        headers: { 'Authorization': `token ${G_TOKEN}` }
+    });
+    // ... 后续逻辑不变 ...
+}
+
 </script>
 
 </body>
