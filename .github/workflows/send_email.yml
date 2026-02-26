@@ -11,23 +11,26 @@ jobs:
     steps:
       - name: Extract Info
         id: info
+        # 使用 EOF 这种“多行模式”安全地读取 Issue Body，防止被当做命令执行
         run: |
-          BODY="${{ github.event.issue.body }}"
-          
-          # 使用 sed 提取信息，这种方式对 exit code 127 更友好
-          EMAIL=$(echo "$BODY" | sed -n 's/.*联系邮箱\*\*: \(.*\)/\1/p' | head -n 1 | xargs)
-          USER_ID=$(echo "$BODY" | sed -n 's/.*游戏 ID\*\*: \(.*\)/\1/p' | head -n 1 | xargs)
-          PASSWORD=$(echo "$BODY" | sed -n 's/.*生成密码\*\*: \(.*\)/\1/p' | head -n 1 | xargs)
-          
-          # 调试输出（可以在 Actions 日志里看到是否抓取成功）
-          echo "Debug: Email is [$EMAIL]"
-          echo "Debug: User is [$USER_ID]"
-          
+          cat << 'EOF' > issue_body.txt
+          ${{ github.event.issue.body }}
+          EOF
+
+          # 从文件中提取数据，更安全稳健
+          EMAIL=$(grep "联系邮箱" issue_body.txt | sed 's/.*: //')
+          USER_ID=$(grep "游戏 ID" issue_body.txt | sed 's/.*: //')
+          PASSWORD=$(grep "生成密码" issue_body.txt | sed 's/.*: //')
+
           echo "email=$EMAIL" >> $GITHUB_OUTPUT
           echo "user_id=$USER_ID" >> $GITHUB_OUTPUT
           echo "password=$PASSWORD" >> $GITHUB_OUTPUT
+          
+          echo "Debug: Extracted Email is [$EMAIL]"
+          echo "Debug: Extracted User is [$USER_ID]"
 
       - name: Send Email via Resend
+        # 只有在成功提取到邮箱时才发邮件
         if: steps.info.outputs.email != ''
         run: |
           curl -X POST 'https://api.resend.com/emails' \
@@ -37,5 +40,5 @@ jobs:
               "from": "Shivr-dev Studio <onboarding@resend.dev>",
               "to": ["${{ steps.info.outputs.email }}"],
               "subject": "【Shivr-dev】开发者接入许可已下发",
-              "html": "<div style=\"background:#1a1a1a; color:#ffffff; padding:20px; border:4px solid #6CC349; font-family:sans-serif;\"><h2 style=\"color:#6CC349;\">ACCESS GRANTED</h2><p>你好 <strong>${{ steps.info.outputs.user_id }}</strong>，你的申请已通过审核。</p><div style=\"background:#222; padding:15px; border:1px solid #444;\"><p>登录账号: ${{ steps.info.outputs.user_id }}</p><p>初始密码: <span style=\"color:#FFE866;\">${{ steps.info.outputs.password }}</span></p></div><p style=\"font-size:12px; color:#888; margin-top:20px;\">请前往官网 Admin Login 登录。建议登录后不要随意分享密码。</p></div>"
+              "html": "<div style=\"background:#1a1a1a; color:#ffffff; padding:20px; border:4px solid #6CC349; font-family:sans-serif;\"><h2 style=\"color:#6CC349;\">ACCESS GRANTED</h2><p>你好 <strong>${{ steps.info.outputs.user_id }}</strong>，你的申请已通过审核。</p><div style=\"background:#222; padding:15px; border:1px solid #444;\"><p>登录账号: ${{ steps.info.outputs.user_id }}</p><p>初始密码: <span style=\"color:#FFE866;\">${{ steps.info.outputs.password }}</span></p></div><p style=\"font-size:12px; color:#888; margin-top:20px;\">请前往官网 Admin Login 登录。建议登录后修改或妥善保存密码。</p></div>"
             }'
