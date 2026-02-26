@@ -871,6 +871,13 @@
     });
     // ... 后续逻辑不变 ...
 }
+async function adminLogin() {
+    // 这里的 URL 使用 AUTH_REPO
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${AUTH_REPO}/issues?labels=approved&state=all`, {
+        headers: { 'Authorization': `token ${G_TOKEN}` }
+    });
+    // ... 后续逻辑不变 ...
+}
 
 </script>
 
