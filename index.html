@@ -432,12 +432,63 @@
         else if (savedRole === 'guest') { document.getElementById('rememberMe').checked = true; grantAccess('guest', true); }
     };
 
-    function adminLogin() {
-        if (document.getElementById('loginUser').value === 'Infrato' && document.getElementById('loginPass').value === 'hajimi') {
+       // 用这段代码替换掉主投票页面的 adminLogin() 函数
+    async function adminLogin() {
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value.trim();
+        
+        if (!u || !p) {
+            alert("请输入用户名和密码！");
+            return;
+        }
+
+        // 1. 保留你的超级管理员后门 (站长专用)
+        if (u === 'Infrato' && p === 'hajimi') {
             if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
             grantAccess('admin', false);
-        } else { alert("Credentials Error!"); }
+            return;
+        }
+
+        // 2. 动态验证普通开发者的注册信息
+        // 把登录按钮文字改一下提示正在加载
+        document.querySelector('#loginModal .btn-save').innerText = 'VERIFYING...';
+        
+        try {
+            // 向 GitHub 请求所有带有 approved 标签的 issue
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=approved&state=all`, {
+                headers: { 'Authorization': `token ${G_TOKEN}` }
+            });
+            const issues = await res.json();
+            
+            let isValid = false;
+            
+            // 遍历所有审核通过的申请单，寻找匹配的账号密码
+            for (let issue of issues) {
+                // 利用正则精准抓取注册页生成的格式
+                const idMatch = issue.body.match(/- \*\*游戏 ID\*\*: (.*)/);
+                const passMatch = issue.body.match(/- \*\*生成密码\*\*: (.*)/);
+                
+                if (idMatch && passMatch && idMatch[1].trim() === u && passMatch[1].trim() === p) {
+                    isValid = true;
+                    break; // 找到了，直接退出循环
+                }
+            }
+
+            if (isValid) {
+                // 账号密码对上了，且 issue 拥有 approved 标签
+                if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
+                grantAccess('admin', false);
+            } else {
+                alert("登录失败！密码错误，或您的申请尚未被管理员审核通过 (未获得 approved 标签)。");
+            }
+        } catch (e) {
+            alert("验证网络连接失败，请稍后再试！");
+        } finally {
+            // 恢复按钮文字
+            document.querySelector('#loginModal .btn-save').innerText = 'Admin Login';
+        }
     }
+
     function guestLogin() {
         if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'guest');
         grantAccess('guest', false);
