@@ -1,0 +1,36 @@
+name: Send Approval Email
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  send-email:
+    # 只有当增加的标签是 "approved" 时才触发
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract Info from Issue
+        id: info
+        run: |
+          BODY="${{ github.event.issue.body }}"
+          # 使用正则提取，兼容前后空格
+          EMAIL=$(echo "$BODY" | grep -oP '(?<=\*\*联系邮箱\*\*: ).*' | xargs)
+          USER_ID=$(echo "$BODY" | grep -oP '(?<=\*\*游戏 ID\*\*: ).*' | xargs)
+          PASSWORD=$(echo "$BODY" | grep -oP '(?<=\*\*生成密码\*\*: ).*' | xargs)
+          
+          echo "email=$EMAIL" >> $GITHUB_OUTPUT
+          echo "user_id=$USER_ID" >> $GITHUB_OUTPUT
+          echo "password=$PASSWORD" >> $GITHUB_OUTPUT
+
+      - name: Send Post via Resend
+        run: |
+          curl -X POST 'https://api.resend.com/emails' \
+            -H 'Authorization: Bearer ${{ secrets.RESEND_API_KEY }}' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "from": "Shivr-dev Studio <onboarding@resend.dev>",
+              "to": ["${{ steps.info.outputs.email }}"],
+              "subject": "【Shivr-dev】开发者接入许可已下发",
+              "html": "<div style=\"background:#1a1a1a; color:#ffffff; padding:20px; font-family:sans-serif; border:4px solid #6CC349;\"><h2 style=\"color:#6CC349;\">ACCESS GRANTED</h2><p>你好 <strong>${{ steps.info.outputs.user_id }}</strong>，</p><p>经过评估，你的开发者申请已获得批准。欢迎加入 Shivr-dev Studio 想法实验室。</p><div style=\"background:#313233; padding:15px; border:2px solid #1E1E1F;\"><p style=\"margin:5px 0;\"><strong>登录账号:</strong> ${{ steps.info.outputs.user_id }}</p><p style=\"margin:5px 0;\"><strong>初始密码:</strong> <span style=\"color:#FFE866;\">${{ steps.info.outputs.password }}</span></p></div><p style=\"font-size:12px; color:#888;\">注意：请妥善保管你的凭据。现在你可以前往官网进行 Admin Login。</p></div>"
+            }'
