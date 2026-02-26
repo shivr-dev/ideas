@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivrdev|更新投票</title>
+    <title>Shivrdev | 更新投票</title>
     <style>
         /* ==========================================
            1. Ore UI 核心字体与色彩系统
@@ -14,39 +14,39 @@
         @font-face { font-family: 'Minecraft Seven'; src: url("./OreUI/fonts/Minecraft-Seven.otf") format('opentype'); }
         @font-face { font-family: 'Minecraft Five Bold'; src: url("./OreUI/fonts/Minecraft-Five-Bold.otf") format('opentype'); }
 
+        /* 强制全局去圆角，覆盖所有原生组件 */
+        *, *::before, *::after { border-radius: 0 !important; }
+
         body { 
             font-family: "Minecraft Seven", sans-serif; 
-            background-color: #48494A; /* Ore UI 经典深灰背景 */
+            background-color: #48494A; 
             margin: 0; padding: 20px; color: #FFFFFF; 
             overflow-x: hidden;
         }
 
-        /* 标题映射 */
         h1 { font-family: "Minecraft Ten", sans-serif; font-size: 32px; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin-top: 0; }
         h2, h3 { font-family: "Minecraft Five Bold", sans-serif; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin: 0 0 15px 0;}
 
         .container { 
             max-width: 1200px; margin: 0 auto; 
-            background-color: transparent; 
-            position: relative; 
+            background-color: transparent; position: relative; 
             animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
 
         /* ==========================================
-           2. Ore UI 顶部栏与状态提示 (Toast)
+           2. 顶部栏与状态提示 (Toast)
         ========================================== */
         .top-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 20;}
         .tool-btn { 
             background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; 
-            padding: 8px 15px; border-radius: 0; cursor: pointer; 
-            font-family: "Minecraft Seven", sans-serif;
+            padding: 8px 15px; cursor: pointer; font-family: "Minecraft Seven", sans-serif;
             box-shadow: inset 2px 2px rgba(255, 255, 255, 0.15), inset -2px -2px rgba(0, 0, 0, 0.3);
             display: flex; align-items: center; gap: 6px; transition: 0.1s;
         }
         .tool-btn:hover { background-color: #48494A; }
         .tool-btn:active { box-shadow: inset 2px 2px rgba(0,0,0,0.4); transform: translateY(2px); }
 
-        .online-indicator { width: 8px; height: 8px; background: #6CC349; border-radius: 0; border: 2px solid #1E1E1F; animation: pulse 2s infinite; }
+        .online-indicator { width: 8px; height: 8px; background: #6CC349; border: 2px solid #1E1E1F; animation: pulse 2s infinite; }
         
         .status-bar { 
             font-family: "Minecraft Five Bold", sans-serif; font-size: 14px; padding: 12px; margin-bottom: 20px; 
@@ -56,17 +56,15 @@
         .status-error { background-color: #313233; color: #F46D6D; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
 
         /* ==========================================
-           3. Ore UI 按钮系统 (精准复刻像素阴影)
+           3. 按钮系统
         ========================================== */
         .btn { 
             font-family: "Minecraft Seven", sans-serif; cursor: pointer; 
-            border: 2px solid #1E1E1F; border-radius: 0; font-weight: bold; 
-            padding: 10px 20px 14px 20px; /* 底部加高留出立体感 */
-            text-transform: uppercase; text-align: center; display: inline-block;
+            border: 2px solid #1E1E1F; font-weight: bold; 
+            padding: 10px 20px 14px 20px; text-transform: uppercase; text-align: center; display: inline-block;
         }
         .btn:active { transform: translateY(4px); padding-bottom: 10px; margin-top: 4px; }
 
-        /* 灰色普通按钮 */
         .btn-add, .btn-close-modal, .btn-fullscreen, .icon-btn { 
             background-color: #D0D1D4; color: #000000;
             box-shadow: inset 0 -4px #58585A, inset 3px 3px rgba(255, 255, 255, 0.6), inset -3px -7px rgba(255, 255, 255, 0.4);
@@ -74,7 +72,6 @@
         .btn-add:hover, .btn-close-modal:hover, .btn-fullscreen:hover { background-color: #B1B2B5; }
         .btn-add:active, .btn-close-modal:active, .btn-fullscreen:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.8), inset -3px -3px rgba(255, 255, 255, 0.6); }
 
-        /* 绿色确认按钮 */
         .btn-save, .btn-vote { 
             background-color: #3C8527; color: #FFFFFF;
             box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
@@ -82,7 +79,6 @@
         .btn-save:hover, .btn-vote:hover { background-color: #2A641C; }
         .btn-save:active, .btn-vote:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.4), inset -3px -3px rgba(255, 255, 255, 0.3); }
 
-        /* 红色警告按钮 */
         .btn-delete-col, .btn-revoke { 
             background-color: #C33636; color: #FFFFFF; width: 100%; margin-top: 8px; font-size: 13px;
             box-shadow: inset 0 -4px #AD1D1D, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
@@ -91,29 +87,41 @@
         .btn-delete-col:active, .btn-revoke:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.5), inset -3px -3px rgba(255, 255, 255, 0.4); }
 
         .btn-fullscreen { margin-top: 10px; width: 100%; }
+        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;} /* 修复按钮大小 */
 
         /* ==========================================
-           4. Ore UI 输入框与富文本
+           4. 输入框、富文本与原生组件修复
         ========================================== */
-        input[type="text"], input[type="password"], .guest-view-box, .editor-box { 
-            background-color: #313233; color: #FFFFFF;
-            border: 2px solid #1E1E1F; border-radius: 0;
-            box-shadow: inset 0 4px #242425; 
-            padding: 10px; font-family: "Minecraft Seven", sans-serif; 
-            box-sizing: border-box; width: 100%; outline: none;
-            caret-color: #6CC349;
+        input[type="text"], input[type="password"], .guest-view-box, .editor-box, .group-name-input { 
+            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F;
+            box-shadow: inset 0 4px #242425; padding: 10px; font-family: "Minecraft Seven", sans-serif; 
+            box-sizing: border-box; width: 100%; outline: none; caret-color: #6CC349;
         }
         input:focus, .editor-box:focus { border-color: #FFFFFF; }
         
+        /* 针对你写的类补上样式 */
+        .group-name-input { width: 120px; padding: 6px; box-shadow: inset 0 2px #242425; }
+
         .guest-view-box { background-color: #48494A; box-shadow: inset 2px 2px #313233; }
         .editor-box { min-height: 120px; overflow-y: auto; line-height: 1.6; }
         .editor-box img, .guest-view-box img { max-width: 100%; border: 2px solid #1E1E1F; margin: 5px 0; }
 
+        /* 原生文件上传按钮去圆角 */
+        input[type="file"]::file-selector-button {
+            border-radius: 0; background-color: #D0D1D4; border: 2px solid #1E1E1F;
+            font-family: "Minecraft Seven", sans-serif; font-weight: bold; cursor: pointer;
+            box-shadow: inset 2px 2px #FFF; padding: 4px 8px; margin-right: 10px;
+        }
+
+        /* 原生复选框去圆角 */
+        input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #1E1E1F; background-color: #313233; cursor: pointer; position: relative; }
+        input[type="checkbox"]:checked { background-color: #6CC349; }
+        input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid #1E1E1F; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
         /* ==========================================
-           5. Ore UI 表格与视图容器
+           5. 表格与视图容器
         ========================================== */
         .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
-        /* 像素风滚动条 */
         .table-wrapper::-webkit-scrollbar { height: 16px; background: #313233; border: 2px solid #1E1E1F; }
         .table-wrapper::-webkit-scrollbar-thumb { background: #D0D1D4; border: 2px solid #1E1E1F; box-shadow: inset 2px 2px #FFF; cursor: pointer; }
 
@@ -123,14 +131,13 @@
         td { background-color: #48494A; }
 
         /* ==========================================
-           6. Ore UI 弹窗与控制栏 (Modals)
+           6. 弹窗与控制栏
         ========================================== */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { 
-            background-color: #313233; color: #FFFFFF;
-            border: 4px solid #1E1E1F; box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
-            width: 90%; max-width: 800px; padding: 30px; 
-            display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
+            background-color: #313233; color: #FFFFFF; border: 4px solid #1E1E1F; 
+            box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
+            width: 90%; max-width: 800px; padding: 30px; display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
         }
 
         .filter-area, .group-inputs, .editor-toolbar, .image-upload-wrapper { 
@@ -139,22 +146,26 @@
         }
         
         .filter-label { color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .filter-label input { accent-color: #6CC349; width: 18px; height: 18px; }
 
         /* ==========================================
            7. 状态标签与正圆形拾色器
         ========================================== */
         .tag-select { 
             background-color: #D0D1D4; border: 2px solid #1E1E1F; color: #000; 
-            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; box-shadow: inset 2px 2px #FFF;
+            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; 
+            box-shadow: inset 2px 2px #FFF; appearance: none; -webkit-appearance: none;
         }
+        /* 添加一个简单的自定义下拉箭头 */
+        .tag-select-wrapper { position: relative; display: inline-block; }
+        .tag-select-wrapper::after { content: '▼'; font-size: 8px; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #000; }
+
         .tag-badge { 
             font-family: "Minecraft Five Bold", sans-serif; font-size: 11px; padding: 4px 8px; color: #FFF; 
             border: 2px solid #1E1E1F; display: inline-block; vertical-align: middle; box-shadow: inset 2px 2px rgba(255,255,255,0.3); text-transform: uppercase;
         }
-        .tag-想法 { background-color: #6CC349; } /* 绿色 */
-        .tag-更新 { background-color: #FFE866; color: #000; } /* 黄色 */
-        .tag-紧急 { background-color: #F46D6D; animation: pulse-live 1.5s infinite; } /* 红色 */
+        .tag-想法 { background-color: #6CC349; } 
+        .tag-更新 { background-color: #FFE866; color: #000; } 
+        .tag-紧急 { background-color: #F46D6D; animation: pulse-live 1.5s infinite; } 
 
         @keyframes pulse-live { 0% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(244, 109, 109, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0); } }
 
@@ -163,17 +174,20 @@
             box-shadow: inset 2px 2px rgba(255,255,255,0.2); font-size: 12px; margin-bottom: 8px; display: inline-block;
         }
 
-        /* 完美的正圆形拾色器 */
+        /* 唯一的特例：正圆形拾色器 */
+        .group-color-input, .group-color-input::-webkit-color-swatch, .group-color-input::-webkit-color-swatch-wrapper { 
+            border-radius: 50% !important; 
+        }
         .group-color-input { 
             -webkit-appearance: none; appearance: none; width: 28px !important; height: 28px !important; 
-            padding: 0; border: 2px solid #1E1E1F; border-radius: 50%; cursor: pointer; 
+            padding: 0; border: 2px solid #1E1E1F; cursor: pointer; 
             box-shadow: inset 2px 2px rgba(255,255,255,0.4); background-color: transparent; overflow: hidden; 
         }
         .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
-        .group-color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
+        .group-color-input::-webkit-color-swatch { border: none; }
 
         /* ==========================================
-           8. Ore UI 投票卡片
+           8. 投票卡片
         ========================================== */
         .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
         .vote-card { 
@@ -201,12 +215,9 @@
     };
 
     function playSnd(type) {
-        try { 
-            if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); }
-        } catch(e) {}
+        try { if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); } } catch(e) {}
     }
 
-    // 全局事件委托：自动为所有按钮和输入框绑定 Minecraft 音效
     document.addEventListener('click', function(e) {
         if (e.target.closest('.btn') || e.target.closest('.format-btn')) { playSnd('button'); } 
         else if (e.target.closest('input[type="checkbox"]') || e.target.closest('input[type="color"]') || e.target.closest('.icon-btn')) { playSnd('click'); }
@@ -215,12 +226,12 @@
 
 <div class="modal-overlay" id="loginModal" style="display: flex;">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2> AUTHORIZATION</h2>
+        <h2>AUTHORIZATION</h2>
         <p style="color: #B1B2B5; font-size: 14px; margin-bottom: 25px;">Enter credentials to access Admin UI</p>
         <input type="text" id="loginUser" class="login-input" placeholder="Username (Admin: Infrato)">
         <input type="password" id="loginPass" class="login-input" placeholder="Password">
         <div style="text-align: left; margin-bottom: 20px;">
-            <label style="cursor: pointer; color: #FFF; font-size:14px;"><input type="checkbox" id="rememberMe"> Remember Me</label>
+            <label class="filter-label"><input type="checkbox" id="rememberMe"> Remember Me</label>
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="btn btn-save" onclick="adminLogin()">Admin Login</button>
@@ -231,7 +242,7 @@
 
 <div class="modal-overlay" id="adminGuideModal">
     <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2> WELCOME ADMIN</h2>
+        <h2>WELCOME ADMIN</h2>
         <div style="background: #1E1E1F; border: 2px solid #5A5B5C; padding: 15px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
             > Manage Map Ideas and Votes.<br>
             > Group colors auto-sync.<br>
@@ -258,7 +269,7 @@
     <div id="status" class="status-bar status-ok">Connecting to Server...</div>
     
     <div class="filter-area" id="filterArea">
-        <strong style="color: #FFF; font-size: 15px; margin-right: 5px;">👀 VIEW FILTER:</strong>
+        <strong style="color: #FFF; font-size: 15px; margin-right: 5px;">VIEW FILTER:</strong>
         <label class="filter-label"><input type="checkbox" id="selectAllFilters" onchange="toggleAllFilters(this)" checked>ALL</label>
         <div style="width: 2px; height: 16px; background: #5A5B5C; margin: 0 5px;"></div>
         <div id="dynamicFilters" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;"></div>
@@ -273,21 +284,21 @@
     
     <div class="admin-controls" id="adminButtons">
         <button class="btn btn-add" onclick="addColumn()">+ ADD IDEA</button>
-        <button class="btn btn-save" onclick="manualSave()"> SAVE ALL</button>
+        <button class="btn btn-save" onclick="manualSave()">SAVE ALL</button>
     </div>
 
     <hr style="margin: 40px 0; border: 0; border-top: 4px solid #313233;">
-    <h2>📊 VOTING AREA</h2>
+    <h2>VOTING AREA</h2>
     <p style="text-align: center; color: #B1B2B5; font-size: 14px;">1 Vote per idea per device.</p>
     <div id="voteArea" class="vote-grid"></div>
 </div>
 
 <div class="modal-overlay" id="editModal">
     <div class="modal-content">
-        <h2> DETAILS EDITOR</h2>
+        <h2>DETAILS EDITOR</h2>
         <div class="image-upload-wrapper" id="imageUploadArea">
             <div>
-                <label style="font-weight: bold; font-size: 15px; color: #6CC349;">📁 Upload Image:</label>
+                <label style="font-weight: bold; font-size: 15px; color: #6CC349;">UPLOAD IMAGE:</label>
                 <p style="margin: 5px 0 0 0; font-size: 12px; color: #B1B2B5;">Upload directly to GitHub /images repo.</p>
             </div>
             <input type="file" id="imageInput" accept="image/*" onchange="uploadImageToRepo(event)" style="width: 200px;">
@@ -297,7 +308,7 @@
             <button class="format-btn" style="font-style: italic;" onclick="formatText('italic')" title="斜体">I</button>
             <button class="format-btn" style="text-decoration: underline;" onclick="formatText('underline')" title="下划线">U</button>
         </div>
-        <div id="fullscreenEditor" class="modal-editor" contenteditable="true" placeholder="Enter details..."></div>
+        <div id="fullscreenEditor" class="modal-editor editor-box" contenteditable="true" placeholder="Enter details..."></div>
         <div id="fullscreenGuestView" class="guest-view-box modal-editor" style="display: none;" contenteditable="false"></div>
         <div class="modal-actions">
             <button class="btn btn-close-modal" onclick="closeModal('editModal')">CANCEL</button>
@@ -307,7 +318,6 @@
 </div>
 
 <script>
-    // ======= 请配置你的 Token =======
     const p1 = 'ghp_'; 
     const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; 
     const G_TOKEN = p1 + p2; 
@@ -315,25 +325,13 @@
     const REPO_OWNER = 'shivr-dev';
     const REPO_NAME = 'ideas';
     const ISSUE_ID = 1; 
-    // ================================
 
-    // 核心数据结构 (全功能保留)
-    let data = { 
-        topics: ["添加隐藏宝箱", "做个月球地图"], 
-        contents: ["在地图角落放一些彩蛋<br>", "可以在失重环境下跳跃<br>"],
-        editTimes: ["", ""], 
-        votes: [0, 0],
-        groups: ["", ""],          
-        groupColors: ["#0366d6", "#0366d6"],
-        tags: ["想法", "想法"] 
-    };
-
+    let data = { topics: [], contents: [], editTimes: [], votes: [], groups: [], groupColors: [], tags: [] };
     let currentUserRole = null; 
     let isFirstLoad = true;
     let currentEditIndex = -1;
     let activeFilters = new Set(); 
 
-    // --- 页面初始化加载 ---
     window.onload = function() {
         const savedRole = localStorage.getItem('userRole');
         if (savedRole === 'admin') { document.getElementById('rememberMe').checked = true; grantAccess('admin', true); } 
@@ -363,7 +361,6 @@
         loadData(); setInterval(loadData, 8000); 
     }
 
-    // --- 数据同步核心 ---
     async function loadData() {
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
@@ -381,33 +378,37 @@
                 
                 data = remoteData;
                 if (isFirstLoad) { 
-                    data.groups.forEach(g => activeFilters.add(g || "未分组"));
+                    data.groups.forEach(g => activeFilters.add(g || "UNGROUPED"));
                     renderFilters(); renderTable(); isFirstLoad = false; 
-                } else { renderFilters(); }
-                
+                    // 仅在首次加载时播放声音
+                    showStatus("SYNCED WITH SERVER", "status-ok", true);
+                } else { 
+                    renderFilters(); 
+                    // 自动刷新时静音
+                    showStatus("SYNCED WITH SERVER", "status-ok", false);
+                }
                 renderVotes(); updateOnlineCounter();
-                showStatus("✅ SYNCED WITH SERVER", "status-ok");
             }
         } catch (e) {
             if (e.name === 'SyntaxError') saveDataToServer(); 
-            else showStatus("❌ SYNC FAILED", "status-error");
+            else showStatus("SYNC FAILED", "status-error", true);
         }
     }
 
     async function saveDataToServer() {
         if (currentUserRole !== 'admin') return; 
-        showStatus("⏳ SAVING...", "status-ok");
+        showStatus("SAVING...", "status-ok", false);
         try {
             await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
                 method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ body: JSON.stringify(data) })
             });
-            showStatus("✅ SAVED SUCCESSFULLY", "status-ok");
+            // 手动保存成功时播放声音
+            showStatus("SAVED SUCCESSFULLY", "status-ok", true);
             renderFilters(); renderVotes(); 
-        } catch (e) { showStatus("❌ SAVE ERROR", "status-error"); }
+        } catch (e) { showStatus("SAVE ERROR", "status-error", true); }
     }
 
-    // --- 颜色哈希生成引擎 ---
     function hslToHex(h, s, l) {
         l /= 100; const a = s * Math.min(l, 1 - l) / 100;
         const f = n => { const k = (n + h / 30) % 12; const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * color).toString(16).padStart(2, '0'); };
@@ -434,7 +435,6 @@
     function toggleColorMenu(index) {
         const menu = document.getElementById(`color_menu_${index}`);
         menu.style.display = menu.style.display === 'none' ? 'inline-block' : 'none';
-        playSnd('click');
     }
 
     function syncGroupColors(triggerIndex) {
@@ -464,19 +464,18 @@
         renderVotes();
     }
 
-    // --- 视图过滤管理器 ---
     function renderFilters() {
         const container = document.getElementById('dynamicFilters'); container.innerHTML = '';
         let uniqueGroups = new Map(); 
-        data.groups.forEach((g, i) => { let name = g || "未分组"; if (!uniqueGroups.has(name)) uniqueGroups.set(name, data.groupColors[i]); });
+        data.groups.forEach((g, i) => { let name = g || "UNGROUPED"; if (!uniqueGroups.has(name)) uniqueGroups.set(name, data.groupColors[i]); });
 
         uniqueGroups.forEach((color, name) => {
             const isChecked = activeFilters.has(name) ? 'checked' : '';
-            const displayColor = name === "未分组" ? "#5A5B5C" : color;
+            const displayColor = name === "UNGROUPED" ? "#5A5B5C" : color;
             container.innerHTML += `
                 <label class="filter-label">
                     <input type="checkbox" value="${name}" onchange="toggleSingleFilter(this)" ${isChecked}>
-                    <span style="display:inline-block; width:12px; height:12px; border:2px solid #1E1E1F; background:${displayColor};"></span>
+                    <span style="display:inline-block; width:12px; height:12px; border:2px solid #1E1E1F; background:${displayColor}; margin-left:4px;"></span>
                     ${name}
                 </label>`;
         });
@@ -485,16 +484,15 @@
 
     function toggleAllFilters(checkbox) {
         activeFilters.clear();
-        if (checkbox.checked) data.groups.forEach(g => activeFilters.add(g || "未分组"));
-        renderFilters(); renderTable(); renderVotes(); playSnd('click');
+        if (checkbox.checked) data.groups.forEach(g => activeFilters.add(g || "UNGROUPED"));
+        renderFilters(); renderTable(); renderVotes();
     }
     function toggleSingleFilter(checkbox) {
         const val = checkbox.value;
         if (checkbox.checked) activeFilters.add(val); else activeFilters.delete(val);
-        renderFilters(); renderTable(); renderVotes(); playSnd('click');
+        renderFilters(); renderTable(); renderVotes();
     }
 
-    // --- 界面渲染引擎 ---
     function renderTable() {
         const tHead = document.getElementById('tHead'); const tBody = document.getElementById('tBody');
         tHead.innerHTML = ''; tBody.innerHTML = ''; 
@@ -503,7 +501,7 @@
         let th2 = document.createElement('th'); th2.innerText = '2. TITLE & TAGS'; tr2.appendChild(th2);
         let th3 = document.createElement('th'); th3.innerText = '3. DETAILS'; tr3.appendChild(th3);
 
-        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "未分组"));
+        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "UNGROUPED"));
         indices.sort((a, b) => {
             let gA = data.groups[a] || ""; let gB = data.groups[b] || "";
             if (gA && !gB) return -1; if (!gA && gB) return 1;
@@ -524,13 +522,15 @@
                     <input type="text" id="topic_${i}" value="${topic}" placeholder="Title">
                     <div class="group-inputs">
                         <span style="font-size: 12px; font-weight: bold;">GRP:</span>
-                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" oninput="handleGroupInput(${i})" placeholder="Group (Empty=None)">
-                        <button class="icon-btn" onclick="toggleColorMenu(${i})" title="Color">🎨</button>
-                        <select id="tag_${i}" class="tag-select" onchange="syncDomToData(); renderTable(); renderVotes(); playSnd('click')">
-                            <option value="想法" ${tag==='想法'?'selected':''}>💡 IDEA</option>
-                            <option value="更新" ${tag==='更新'?'selected':''}>🔄 UPDATE</option>
-                            <option value="紧急" ${tag==='紧急'?'selected':''}>🚨 URGENT</option>
-                        </select>
+                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" oninput="handleGroupInput(${i})" placeholder="Group Name">
+                        <button class="icon-btn" onclick="toggleColorMenu(${i})" title="Color">PALETTE</button>
+                        <div class="tag-select-wrapper">
+                            <select id="tag_${i}" class="tag-select" onchange="syncDomToData(); renderTable(); renderVotes(); playSnd('click')">
+                                <option value="想法" ${tag==='想法'?'selected':''}>IDEA</option>
+                                <option value="更新" ${tag==='更新'?'selected':''}>UPDATE</option>
+                                <option value="紧急" ${tag==='紧急'?'selected':''}>URGENT</option>
+                            </select>
+                        </div>
                         <span id="color_menu_${i}" style="display:none; position:absolute; top:-40px; right:0; background:#313233; padding:5px; border:2px solid #1E1E1F; z-index:10;">
                             <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" oninput="syncGroupColors(${i})">
                         </span>
@@ -574,7 +574,7 @@
 
     function deleteColumn(index) {
         if (currentUserRole !== 'admin') return;
-        if (!confirm("⚠️ Confirm Delete? Action is irreversible!")) return;
+        if (!confirm("Confirm Delete? Action is irreversible!")) return;
         syncDomToData(); 
         data.topics.splice(index, 1); data.contents.splice(index, 1); data.editTimes.splice(index, 1); data.votes.splice(index, 1);
         data.groups.splice(index, 1); data.groupColors.splice(index, 1); data.tags.splice(index, 1);
@@ -586,7 +586,7 @@
         syncDomToData(); 
         data.topics.push(""); data.contents.push("<br>"); data.editTimes.push(""); data.votes.push(0);
         data.groups.push(""); data.groupColors.push("#0366d6"); data.tags.push("想法");
-        activeFilters.add("未分组"); 
+        activeFilters.add("UNGROUPED"); 
         renderFilters(); renderTable(); saveDataToServer(); 
         setTimeout(() => { const container = document.getElementById('scrollContainer'); container.scrollLeft = container.scrollWidth; }, 100);
     }
@@ -595,7 +595,7 @@
 
     async function uploadImageToRepo(event) {
         const file = event.target.files[0]; if (!file) return;
-        showStatus("⏳ UPLOADING IMAGE...", "status-ok"); document.getElementById('btnSaveFullscreen').disabled = true;
+        showStatus("UPLOADING IMAGE...", "status-ok", false); document.getElementById('btnSaveFullscreen').disabled = true;
         const reader = new FileReader();
         reader.onload = async function(e) {
             const img = new Image();
@@ -611,8 +611,8 @@
                     if (!res.ok) throw new Error(`API Error`);
                     const uploadResult = await res.json();
                     document.getElementById('fullscreenEditor').focus(); document.execCommand('insertHTML', false, `<br><img src="${uploadResult.content.download_url}"><br>`);
-                    showStatus("✅ IMAGE UPLOADED", "status-ok");
-                } catch (err) { alert("Upload Failed"); showStatus("❌ UPLOAD ERROR", "status-error"); } 
+                    showStatus("IMAGE UPLOADED", "status-ok", true);
+                } catch (err) { alert("Upload Failed"); showStatus("UPLOAD ERROR", "status-error", true); } 
                 finally { event.target.value = ''; document.getElementById('btnSaveFullscreen').disabled = false; }
             }; img.src = e.target.result;
         }; reader.readAsDataURL(file);
@@ -633,7 +633,7 @@
 
     function renderVotes() {
         const voteArea = document.getElementById('voteArea'); voteArea.innerHTML = ''; const myVotes = getMyVotes();
-        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "未分组"));
+        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "UNGROUPED"));
         indices.sort((a, b) => { let gA = data.groups[a] || ""; let gB = data.groups[b] || ""; if (gA && !gB) return -1; if (!gA && gB) return 1; if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN'); return a - b; });
 
         indices.forEach((i) => {
@@ -657,7 +657,14 @@
 
     function openModal(id) { const m = document.getElementById(id); m.style.display = 'flex'; setTimeout(() => m.style.opacity = '1', 10); playSnd('pop'); }
     function closeModal(id) { const m = document.getElementById(id); m.style.opacity = '0'; setTimeout(() => m.style.display = 'none', 300); }
-    function showStatus(msg, cls) { document.getElementById('status').innerText = msg; document.getElementById('status').className = `status-bar ${cls}`; playSnd('toast'); }
+    
+    // 增加了一个 mute 参数，用来控制是否播放音效
+    function showStatus(msg, cls, playSound = true) { 
+        document.getElementById('status').innerText = msg; 
+        document.getElementById('status').className = `status-bar ${cls}`; 
+        if (playSound) { playSnd('toast'); }
+    }
+    
     function updateOnlineCounter() { document.getElementById('onlineCount').innerText = `Online: ${Math.max(1, Math.floor(data.votes.reduce((a, b) => a + b, 0) / 2)) + ((Math.floor(Date.now() / 15000) + data.votes.reduce((a, b) => a + b, 0)) % 4)}`; }
 </script>
 
