@@ -412,7 +412,7 @@
 </div>
 
 <script>
-        // ============ 核心配置：双仓库分家 ============
+    // ============ 核心配置：双仓库分家 ============
     const p1 = 'ghp_'; 
     const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; 
     const G_TOKEN = p1 + p2; 
@@ -422,12 +422,11 @@
     // 1. 公开仓库：用来存放大家都能看的投票内容
     const VOTE_REPO = 'ideas'; 
     
-    // 2. 私有仓库：用来存放账号、密码和审核单（必须是你刚新建的那个私有库）
+    // 2. 私有仓库：用来存放账号、密码和审核单
     const AUTH_REPO = 'ideas-data'; 
 
-    // 如果你之前的投票统计是在这个 ID 下，保留它（属于公开库）
+    // 你的投票统计和卡片数据存在公开库的这个 Issue ID 下
     const ISSUE_ID = 1; 
-
 
     let data = { topics: [], contents: [], editTimes: [], votes: [], groups: [], groupColors: [], tags: [] };
     let currentUserRole = null; 
@@ -441,7 +440,7 @@
         else if (savedRole === 'guest') { document.getElementById('rememberMe').checked = true; grantAccess('guest', true); }
     };
 
-       // 用这段代码替换掉主投票页面的 adminLogin() 函数
+    // 验证逻辑：去私有仓库 (AUTH_REPO) 寻找密码
     async function adminLogin() {
         const u = document.getElementById('loginUser').value.trim();
         const p = document.getElementById('loginPass').value.trim();
@@ -451,49 +450,42 @@
             return;
         }
 
-        // 1. 保留你的超级管理员后门 (站长专用)
         if (u === 'Infrato' && p === 'hajimi') {
             if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
             grantAccess('admin', false);
             return;
         }
 
-        // 2. 动态验证普通开发者的注册信息
-        // 把登录按钮文字改一下提示正在加载
         document.querySelector('#loginModal .btn-save').innerText = 'VERIFYING...';
         
         try {
-            // 向 GitHub 请求所有带有 approved 标签的 issue
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=approved&state=all`, {
+            // 🚨 关键修复：这里调用的是私有仓库 AUTH_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${AUTH_REPO}/issues?labels=approved&state=all`, {
                 headers: { 'Authorization': `token ${G_TOKEN}` }
             });
             const issues = await res.json();
             
             let isValid = false;
             
-            // 遍历所有审核通过的申请单，寻找匹配的账号密码
             for (let issue of issues) {
-                // 利用正则精准抓取注册页生成的格式
                 const idMatch = issue.body.match(/- \*\*游戏 ID\*\*: (.*)/);
                 const passMatch = issue.body.match(/- \*\*生成密码\*\*: (.*)/);
                 
                 if (idMatch && passMatch && idMatch[1].trim() === u && passMatch[1].trim() === p) {
                     isValid = true;
-                    break; // 找到了，直接退出循环
+                    break;
                 }
             }
 
             if (isValid) {
-                // 账号密码对上了，且 issue 拥有 approved 标签
                 if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
                 grantAccess('admin', false);
             } else {
-                alert("登录失败！密码错误，或您的申请尚未被管理员审核通过 (未获得 approved 标签)。");
+                alert("登录失败！密码错误，或您的申请尚未被管理员审核通过。");
             }
         } catch (e) {
             alert("验证网络连接失败，请稍后再试！");
         } finally {
-            // 恢复按钮文字
             document.querySelector('#loginModal .btn-save').innerText = 'Admin Login';
         }
     }
@@ -515,9 +507,11 @@
         loadData(); setInterval(loadData, 8000); 
     }
 
+    // 读档逻辑：去公开仓库 (VOTE_REPO) 读取大家的想法和投票
     async function loadData() {
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+            // 🚨 关键修复：使用 VOTE_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
             if (!res.ok) throw new Error("Connection Failed");
             
             const issue = await res.json();
@@ -553,11 +547,13 @@
         }
     }
 
+    // 存档逻辑：保存到公开仓库 (VOTE_REPO)
     async function saveDataToServer() {
         if (currentUserRole !== 'admin') return; 
         showStatus("SAVING...", "status-ok", false);
         try {
-            await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, {
+            // 🚨 关键修复：使用 VOTE_REPO
+            await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, {
                 method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ body: JSON.stringify(data) })
             });
@@ -703,13 +699,11 @@
 
             let td3 = document.createElement('td');
             if (currentUserRole === 'admin') {
-                // 🚀 加入 .line-clamp-8 限制 8 行
                 let contentDiv = document.createElement('div'); contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box line-clamp-8'; contentDiv.contentEditable = true; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
                 let toolsDiv = document.createElement('div');
                 toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">ZOOM EDITOR</button><button class="btn btn-delete-col" onclick="deleteColumn(${i})">DELETE THIS</button>`;
                 td3.appendChild(toolsDiv);
             } else {
-                // 🚀 加入 .line-clamp-8 限制 8 行
                 let contentDiv = document.createElement('div'); contentDiv.className = 'guest-view-box line-clamp-8'; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
                 let toolsDiv = document.createElement('div'); toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">DETAILS</button>`; td3.appendChild(toolsDiv);
             }
@@ -752,9 +746,9 @@
 
     function formatText(cmd) { document.execCommand(cmd, false, null); document.getElementById('fullscreenEditor').focus(); }
 
+    // 上传文件：保存到公开仓库 (VOTE_REPO)，这样游客才能看到图片
     async function uploadFileToRepo(event) {
         const file = event.target.files[0]; if (!file) return;
-        
         if (file.size > 20 * 1024 * 1024) { alert("File too large (Max 20MB)"); return; }
         
         showStatus("UPLOADING FILE...", "status-ok", false); 
@@ -781,7 +775,8 @@
             });
 
             const filename = `file_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/uploads/${filename}`, {
+            // 🚨 关键修复：使用 VOTE_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/contents/uploads/${filename}`, {
                 method: 'PUT', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, 
                 body: JSON.stringify({ message: `Upload file`, content: base64Data })
             });
@@ -796,11 +791,9 @@
             const isAudio = file.type.startsWith('audio/') || file.name.toLowerCase().match(/\.(ogg|mp3|wav)$/i);
             const isMidi = file.name.toLowerCase().match(/\.(mid|midi)$/i);
             
-            // 🚀 这里通过 onclick="event.stopPropagation(); window.playSnd('button'); window.showStatus(...);" 完美接管了下载按钮
             if (file.type.startsWith('image/')) {
                 insertHtml = `<br><div contenteditable="false" style="display:inline-block; border:2px solid #1E1E1F; background:#313233; padding:10px; margin:5px 0;"><img src="${fileUrl}" style="max-width:100%; border:2px solid #1E1E1F;"><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" onclick="event.stopPropagation(); window.playSnd('button'); window.showStatus('DOWNLOAD OPENED IN NEW WINDOW', 'status-ok', true);" style="text-decoration:none; margin-top:10px; display:inline-block;">DOWNLOAD IMAGE</a></div><br>`;
             } else if (isAudio || isMidi) {
-                // 音频交给 Shadow DOM 处理，彻底免疫 contenteditable 干扰
                 insertHtml = `<br><ore-audio src="${fileUrl}" name="${file.name}"></ore-audio><br>`;
             } else {
                 insertHtml = `<br><div contenteditable="false" style="padding:10px; border:2px solid #1E1E1F; background:#313233; margin:5px 0;"><span style="color:#FFE866; font-family:'Minecraft Five Bold'; font-size:12px;">📄 FILE: ${file.name}</span><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" onclick="event.stopPropagation(); window.playSnd('button'); window.showStatus('DOWNLOAD OPENED IN NEW WINDOW', 'status-ok', true);" style="margin-top:10px; text-decoration:none; display:inline-block;">DOWNLOAD FILE</a></div><br>`;
@@ -851,8 +844,9 @@
         });
     }
 
-    function castVote(index) { let myVotes = getMyVotes(); if (myVotes[index]) return; data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
-    function revokeVote(index) { let myVotes = getMyVotes(); if (!myVotes[index]) return; if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
+    // 🚨 关键修复：点赞和取消点赞均使用 VOTE_REPO
+    function castVote(index) { let myVotes = getMyVotes(); if (myVotes[index]) return; data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
+    function revokeVote(index) { let myVotes = getMyVotes(); if (!myVotes[index]) return; if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
 
     function openModal(id) { const m = document.getElementById(id); m.style.display = 'flex'; setTimeout(() => m.style.opacity = '1', 10); playSnd('pop'); }
     function closeModal(id) { const m = document.getElementById(id); m.style.opacity = '0'; setTimeout(() => m.style.display = 'none', 300); }
@@ -864,21 +858,6 @@
     }
     
     function updateOnlineCounter() { document.getElementById('onlineCount').innerText = `Online: ${Math.max(1, Math.floor(data.votes.reduce((a, b) => a + b, 0) / 2)) + ((Math.floor(Date.now() / 15000) + data.votes.reduce((a, b) => a + b, 0)) % 4)}`; }
-    async function loadIdeas() {
-    // 这里的 URL 使用 VOTE_REPO
-    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues?labels=idea`, {
-        headers: { 'Authorization': `token ${G_TOKEN}` }
-    });
-    // ... 后续逻辑不变 ...
-}
-async function adminLogin() {
-    // 这里的 URL 使用 AUTH_REPO
-    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${AUTH_REPO}/issues?labels=approved&state=all`, {
-        headers: { 'Authorization': `token ${G_TOKEN}` }
-    });
-    // ... 后续逻辑不变 ...
-}
-
 </script>
 
 </body>
